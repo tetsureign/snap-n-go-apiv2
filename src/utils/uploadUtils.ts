@@ -18,8 +18,8 @@ function fileFilter(
   file: Express.Multer.File,
   cb: FileFilterCallback
 ) {
-  // Only accepts .png, .jpg, .jpeg files
-  const fileTypes = /.png|.jpg|.jpeg/;
+  // Only accepts .png, .jpg, .jpeg, .bmp, .gif files
+  const fileTypes = /.png|.jpg|.jpeg|.bmp|.gif/;
   const extName = fileTypes.test(path.extname(file.originalname).toLowerCase());
   if (extName) {
     return cb(null, true);
@@ -31,14 +31,14 @@ function fileFilter(
 export const UploadToMem = multer({
   storage: memStorage,
   fileFilter: fileFilter,
-  // Limits the max file size to 15MB
-  limits: { fileSize: 1024 * 1024 * 15 },
+  // Only accepts <= 5MB
+  limits: { fileSize: 1024 * 1024 * 5 },
 });
 
 export const UploadToTemp = multer({
   storage: tempStorage,
   fileFilter: fileFilter,
-  // Limits the max file size to 15MB
+  // Only accepts <= 5MB
   // TODO: Make this dynamic
-  limits: { fileSize: 1024 * 1024 * 15 },
+  limits: { fileSize: 1024 * 1024 * 5 },
 });

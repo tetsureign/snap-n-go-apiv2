@@ -1,25 +1,9 @@
 import express, { Request, Response } from "express";
-import * as tf from "@tensorflow/tfjs-node";
-import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import * as fs from "fs";
-import { UploadToTemp } from "../utils/upload";
+import { UploadToTemp } from "../utils/uploadUtils";
+import { runDetection } from "../services/detectSvc";
 
 const router = express.Router();
-
-function readImageDisk(path: string) {
-  const imageBuffer = fs.readFileSync(path);
-  const tfimage = tf.node.decodeImage(imageBuffer);
-  return tfimage as tf.Tensor3D;
-}
-
-async function detectImage(input: tf.Tensor3D) {
-  const model = await cocoSsd.load();
-  const predictions = await model.detect(input);
-
-  console.log("Predictions: ", predictions);
-
-  return predictions;
-}
 
 router.post(
   "/",
@@ -28,8 +12,7 @@ router.post(
     const filePath = req.file?.path;
 
     if (filePath) {
-      const inputTensor = readImageDisk(filePath);
-      const predictions = await detectImage(inputTensor);
+      const predictions = await runDetection(filePath);
 
       // Delete the file right after finish processing
       fs.unlink(filePath, (err) => {
