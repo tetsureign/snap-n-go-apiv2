@@ -12,14 +12,15 @@ router.post(
     const filePath = req.file?.path;
 
     if (filePath) {
-      const predictions = await runDetection(filePath);
+      const data = await runDetection(filePath);
 
       // Delete the file right after finish processing
       fs.unlink(filePath, (err) => {
         err && console.error("Failed to delete file.");
       });
 
-      res.json({ success: true, predictions });
+      // res.json({ status: 201, data });
+      res.send(data);
     } else throw new Error("No file uploaded.");
   }
 );

@@ -11,6 +11,6 @@ export async function runDetection(imagePath: string) {
     const predictions: cocoSsd.DetectedObject[] = await piscina.run(imagePath);
     return predictions;
   } catch (error: any) {
-    throw new Error(error.message);
+    console.error(error);
   }
 }
