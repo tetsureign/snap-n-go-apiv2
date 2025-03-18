@@ -1,7 +1,7 @@
 import express from "express";
 
-import { handleDetection } from "../controllers/detectionController";
-import { UploadToTemp } from "../utils/uploadUtils";
+import { handleDetection } from "@/controllers/detectionController";
+import { UploadToTemp } from "@/utils/uploadUtils";
 
 const detectRouter = express.Router();
 

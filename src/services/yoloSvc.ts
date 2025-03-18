@@ -19,7 +19,6 @@ export const sendImageToYolo = async (imagePath: string) => {
 
     return response.data;
   } catch (error) {
-    console.error("Error processing image:", error);
-    throw new Error("Error processing image: " + error);
+    throw new Error("Error sending image to microservice: " + error);
   }
 };

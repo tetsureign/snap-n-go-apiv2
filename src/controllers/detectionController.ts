@@ -1,13 +1,17 @@
 import { Request, Response } from "express";
 import fs from "fs";
-import { sendImageToYolo } from "../services/yoloSvc";
 import { AxiosError } from "axios";
+
+import { sendImageToYolo } from "@/services/yoloSvc";
+import logger from "@/utils/logger";
 
 export const handleDetection = async (req: Request, res: Response) => {
   const filePath = req.file?.path;
 
   if (filePath) {
     try {
+      // TODO: detectionResult isn't type safe
+      // zod validation?
       const detectionResult = await sendImageToYolo(filePath);
       res.json({ success: true, data: detectionResult });
     } catch (error) {
@@ -16,7 +20,6 @@ export const handleDetection = async (req: Request, res: Response) => {
         .json({ success: false, message: (error as AxiosError).message });
     }
 
-    // Delete the file right after finish processing
     fs.unlink(filePath, (err) => {
       err && console.error("Failed to delete file.");
     });
