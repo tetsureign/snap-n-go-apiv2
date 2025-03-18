@@ -10,8 +10,6 @@ export const handleDetection = async (req: Request, res: Response) => {
 
   if (filePath) {
     try {
-      // TODO: detectionResult isn't type safe
-      // zod validation?
       const detectionResult = await sendImageToYolo(filePath);
       res.json({ success: true, data: detectionResult });
     } catch (error) {
