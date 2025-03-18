@@ -11,7 +11,7 @@ export const sendImageToYolo = async (imagePath: string) => {
       contentType: "image/jpeg",
     });
 
-    const response = await apiClient.post("/detect", formData, {
+    const response = await apiClient.post("/images/detect", formData, {
       headers: {
         ...formData.getHeaders(),
       },
