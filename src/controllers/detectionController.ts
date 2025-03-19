@@ -3,7 +3,6 @@ import fs from "fs";
 import { AxiosError } from "axios";
 
 import { sendImageToYolo } from "@/services/yoloSvc";
-import logger from "@/utils/logger";
 
 export const handleDetection = async (req: Request, res: Response) => {
   const filePath = req.file?.path;

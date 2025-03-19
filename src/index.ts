@@ -4,7 +4,7 @@ import "dotenv/config";
 
 import detectRouter from "@/routes/detectionRoute";
 import logger from "@/utils/logger";
-import errorHandler from "./middlewares/errorHandler";
+import errorHandler from "@/middlewares/errorHandler";
 
 const app = express();
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
