@@ -1,16 +1,13 @@
-import myssql, { PoolOptions } from "mysql2/promise";
-import "dotenv/config";
+import Knex from "knex";
+import config from "./knexfile";
 
-const access: PoolOptions = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-};
+const knex = Knex(config);
 
-const pool = myssql.createPool(access);
+// SIGINT is what Ctrl + C sends when the process is running
+process.on("SIGINT", async () => {
+  console.log("Shutting down database connection...");
+  await knex.destroy();
+  process.exit(0);
+});
 
-export default pool;
+export default knex;
