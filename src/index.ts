@@ -3,6 +3,8 @@ import cors from "cors";
 import "dotenv/config";
 
 import detectRouter from "@/routes/detectionRoute";
+import userRouter from "./routes/userRoute";
+
 import logger from "@/utils/logger";
 import errorHandler from "@/middlewares/errorHandler";
 
@@ -20,6 +22,7 @@ app.use(express.json());
 const routePrefix = process.env.ROUTE_PREFIX;
 
 app.use(routePrefix + "/detect", detectRouter);
+app.use(routePrefix + "/user", userRouter);
 
 app.listen(port, "0.0.0.0", () => {
   logger.info(`[server] Server started. http://localhost:${port}`);

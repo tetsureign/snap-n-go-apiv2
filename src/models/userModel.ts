@@ -10,11 +10,17 @@ export interface User {
   deleted_at?: Date;
 }
 
-export async function createUser(
-  googleId: string,
-  email: string,
-  name: string
-): Promise<User> {
+type CreateUserType = {
+  googleId: string;
+  email: string;
+  name: string;
+};
+
+export async function createUser({
+  googleId,
+  email,
+  name,
+}: CreateUserType): Promise<User> {
   const userId = uuidv4();
 
   await knex.raw(
