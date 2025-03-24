@@ -11,6 +11,7 @@ const createUserSchema = z.object({
   email: z.string().email("Invalid email format"),
 });
 
+// This only saves data for now. TODO: Add proper Google login.
 export const handleCreateUser = async (req: Request, res: Response) => {
   try {
     const validatedData = createUserSchema.parse(req.body);
@@ -30,6 +31,7 @@ export const handleCreateUser = async (req: Request, res: Response) => {
 
 export const handleGetUserByGoogleId = async (req: Request, res: Response) => {
   const { googleId } = req.params;
+  // TODO: zod validation like the other file
 
   try {
     const user = await getUserByGoogleId(googleId);
