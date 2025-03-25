@@ -11,18 +11,24 @@ const createUserSchema = z.object({
   email: z.string().email("Invalid email format"),
 });
 
+const getUserByGoogleIdSchema = z.object({
+  googleId: z.string().min(1, "Google ID is required."),
+});
+
 // This only saves data for now. TODO: Add proper Google login.
 export const handleCreateUser = async (req: Request, res: Response) => {
-  try {
-    const validatedData = createUserSchema.parse(req.body);
+  const validation = createUserSchema.safeParse(req.body);
+  if (!validation.success)
+    return res
+      .status(400)
+      .json({ success: false, errors: validation.error.errors });
 
-    const newUser = await createUser(validatedData);
+  try {
+    const newUser = await createUser(validation.data);
+
     return res.status(201).json({ success: true, data: newUser });
   } catch (error) {
-    if (error instanceof z.ZodError)
-      return res.status(400).json({ success: false, errors: error.errors });
-
-    logger.error({ err: error }, "Error creating user.");
+    logger.error(error, "Error creating user.");
     return res
       .status(500)
       .json({ success: false, message: "Internal server error" });
@@ -30,11 +36,14 @@ export const handleCreateUser = async (req: Request, res: Response) => {
 };
 
 export const handleGetUserByGoogleId = async (req: Request, res: Response) => {
-  const { googleId } = req.params;
-  // TODO: zod validation like the other file
+  const validation = getUserByGoogleIdSchema.safeParse(req.params);
+  if (!validation.success)
+    return res
+      .status(400)
+      .json({ success: false, errors: validation.error.errors });
 
   try {
-    const user = await getUserByGoogleId(googleId);
+    const user = await getUserByGoogleId(validation.data.googleId);
 
     if (!user) {
       return res
@@ -44,7 +53,10 @@ export const handleGetUserByGoogleId = async (req: Request, res: Response) => {
 
     return res.json({ success: true, data: user });
   } catch (error) {
-    logger.error({ err: error, googleId }, "Error fetching user");
-    return res.status(500).json({ success: false, message: error });
+    logger.error(error, "Error fetching user");
+
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error." });
   }
 };

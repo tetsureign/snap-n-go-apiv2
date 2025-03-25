@@ -18,16 +18,18 @@ const getHistoryByUserIdSchema = z.object({
 });
 
 export const handleAddSearchHistory = async (req: Request, res: Response) => {
-  try {
-    const validatedData = addSearchQuerySchema.parse(req.body);
+  const validation = addSearchQuerySchema.safeParse(req.body);
+  if (!validation.success)
+    return res
+      .status(400)
+      .json({ success: false, errors: validation.error.errors });
 
-    const newHistoryEntry = await addSearchQuery(validatedData);
+  try {
+    const newHistoryEntry = await addSearchQuery(validation.data);
+
     return res.status(201).json({ success: true, data: newHistoryEntry });
   } catch (error) {
-    if (error instanceof z.ZodError)
-      return res.status(400).json({ success: false, errors: error.errors });
-
-    logger.error({ err: error }, "Error adding search history.");
+    logger.error(error, "Error adding search history.");
 
     return res
       .status(500)
@@ -36,11 +38,15 @@ export const handleAddSearchHistory = async (req: Request, res: Response) => {
 };
 
 export const handleGetHistoryByUserId = async (req: Request, res: Response) => {
-  try {
-    const validatedData = getHistoryByUserIdSchema.parse(req.params);
-    const { userId } = validatedData;
+  const validation = getHistoryByUserIdSchema.safeParse(req.params);
+  if (!validation.success) {
+    return res
+      .status(400)
+      .json({ success: false, errors: validation.error.errors });
+  }
 
-    const entries = await getUserSearchHistory(userId);
+  try {
+    const entries = await getUserSearchHistory(validation.data.userId);
 
     if (!entries.length) {
       return res
@@ -50,11 +56,10 @@ export const handleGetHistoryByUserId = async (req: Request, res: Response) => {
 
     return res.json({ success: true, data: entries });
   } catch (error) {
-    if (error instanceof z.ZodError)
-      return res.status(400).json({ success: false, errors: error.errors });
+    logger.error(error, "Error fetching user's search history.");
 
-    logger.error({ err: error }, "Error fetching user's search history.");
-
-    return res.status(500).json({ success: false, message: error });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error." });
   }
 };
