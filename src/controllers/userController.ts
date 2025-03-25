@@ -1,37 +1,75 @@
 import { Request, Response } from "express";
 import z from "zod";
+import { JWT, OAuth2Client } from "google-auth-library";
 
 import { createUser, getUserByGoogleId } from "@/models/userModel";
 
 import logger from "@/utils/logger";
 
-const createUserSchema = z.object({
-  googleId: z.string().min(1, "Google ID is required."),
+const createGoogleUserSchema = z.object({
+  token: z.string().min(1, "Oauth2 token is required."),
+});
+
+const googleUserSchema = z.object({
+  sub: z.string().min(1, "Google ID is required."), // Probably never gonna throw but just in case
   name: z.string().min(1, "Name is required."),
-  email: z.string().email("Invalid email format"),
+  email: z.string().min(1, "Email is required.").email("Invalid email format."),
 });
 
 const getUserByGoogleIdSchema = z.object({
   googleId: z.string().min(1, "Google ID is required."),
 });
 
-// This only saves data for now. TODO: Add proper Google login.
-export const handleCreateUser = async (req: Request, res: Response) => {
-  const validation = createUserSchema.safeParse(req.body);
+const oauth2client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+async function verifyGoogleToken(idToken: string) {
+  const ticket = await oauth2client.verifyIdToken({
+    idToken,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  return ticket.getPayload();
+}
+
+export const handleCreateUserByGoogleId = async (
+  req: Request,
+  res: Response
+) => {
+  const validation = createGoogleUserSchema.safeParse(req.body);
   if (!validation.success)
     return res
       .status(400)
       .json({ success: false, errors: validation.error.errors });
 
+  const googleUser = await verifyGoogleToken(validation.data.token);
+  if (!googleUser)
+    return res.status(401).json({ success: false, message: "Invalid token." });
+
+  const validatedGoogleUser = googleUserSchema.safeParse(googleUser);
+  if (!validatedGoogleUser.success)
+    return res
+      .status(400)
+      .json({ success: false, errors: validatedGoogleUser.error.errors });
+
   try {
-    const newUser = await createUser(validation.data);
+    const newUser = await createUser({
+      googleId: validatedGoogleUser.data.sub,
+      email: validatedGoogleUser.data.email,
+      name: validatedGoogleUser.data.name,
+    });
+
+    if (!newUser)
+      return res
+        .status(409)
+        .json({ success: false, message: "User already exist." });
 
     return res.status(201).json({ success: true, data: newUser });
   } catch (error) {
     logger.error(error, "Error creating user.");
+
     return res
       .status(500)
-      .json({ success: false, message: "Internal server error" });
+      .json({ success: false, message: "Internal server error." });
   }
 };
 

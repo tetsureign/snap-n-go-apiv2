@@ -20,15 +20,24 @@ export async function createUser({
   googleId,
   email,
   name,
-}: CreateUserType): Promise<User> {
-  const userId = uuidv4();
-
-  await knex.raw(
-    `INSERT INTO users (id, google_id, email, name, created_at) VALUES (?, ?, ?, ?, NOW())`,
-    [userId, googleId, email, name]
+}: CreateUserType): Promise<User | null> {
+  const userIdQuery = await knex.raw<{ id: string }[][]>(
+    `SELECT id FROM users WHERE google_id = ?`,
+    [googleId]
   );
 
-  return { id: userId, google_id: googleId, email, name };
+  // If the query returns an empty array -> user doesn't exist
+
+  if (!userIdQuery[0]?.[0]) {
+    const userId = uuidv4();
+    await knex.raw(
+      `INSERT INTO users (id, google_id, email, name, created_at) VALUES (?, ?, ?, ?, NOW())`,
+      [userId, googleId, email, name]
+    );
+    return { id: userId, google_id: googleId, email, name };
+  }
+
+  return null;
 }
 
 export async function getUserByGoogleId(
