@@ -1,4 +1,5 @@
 import knex from "db";
+import { ResultSetHeader } from "mysql2";
 import { v4 as uuidv4 } from "uuid";
 
 export interface User {
@@ -21,23 +22,14 @@ export async function createUser({
   email,
   name,
 }: CreateUserType): Promise<User | null> {
-  const userIdQuery = await knex.raw<{ id: string }[][]>(
-    `SELECT id FROM users WHERE google_id = ?`,
-    [googleId]
+  const userId = uuidv4();
+  await knex.raw(
+    `INSERT INTO users (id, google_id, email, name, created_at) 
+    VALUES (?, ?, ?, ?, NOW()) 
+    ON DUPLICATE KEY UPDATE id = id`,
+    [userId, googleId, email, name]
   );
-
-  // If the query returns an empty array -> user doesn't exist
-
-  if (!userIdQuery[0]?.[0]) {
-    const userId = uuidv4();
-    await knex.raw(
-      `INSERT INTO users (id, google_id, email, name, created_at) VALUES (?, ?, ?, ?, NOW())`,
-      [userId, googleId, email, name]
-    );
-    return { id: userId, google_id: googleId, email, name };
-  }
-
-  return null;
+  return { id: userId, google_id: googleId, email, name };
 }
 
 export async function getUserByGoogleId(
@@ -51,6 +43,11 @@ export async function getUserByGoogleId(
   return result[0]?.[0] ?? null;
 }
 
-export async function softDelUser(userId: string): Promise<void> {
-  await knex.raw(`UPDATE users SET deleted_at = NOW() WHERE id = ?`, [userId]);
+export async function softDelUser(userId: string): Promise<number> {
+  const result = await knex.raw<ResultSetHeader[]>(
+    `UPDATE users SET deleted_at = NOW() WHERE id = ?`,
+    [userId]
+  );
+
+  return result[0].affectedRows;
 }
