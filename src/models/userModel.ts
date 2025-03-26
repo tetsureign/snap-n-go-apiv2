@@ -26,28 +26,37 @@ export async function createUser({
   await knex.raw(
     `INSERT INTO users (id, google_id, email, name, created_at) 
     VALUES (?, ?, ?, ?, NOW()) 
-    ON DUPLICATE KEY UPDATE id = id`,
+    ON DUPLICATE KEY UPDATE
+      email = VALUES(email),
+      name = VALUES(name),
+      deleted_at = NULL, 
+      created_at = NOW()`,
     [userId, googleId, email, name]
   );
-  return { id: userId, google_id: googleId, email, name };
+
+  return getUserByGoogleId(googleId);
 }
 
 export async function getUserByGoogleId(
   googleId: string
 ): Promise<User | null> {
   const result = await knex.raw<User[][]>(
-    `SELECT * FROM users WHERE google_id = ? LIMIT 1`,
+    `SELECT * FROM users WHERE google_id = ? 
+    LIMIT 1`,
     [googleId]
   );
 
   return result[0]?.[0] ?? null;
 }
 
-export async function softDelUser(userId: string): Promise<number> {
+export async function softDelUser(userId: string): Promise<boolean> {
   const result = await knex.raw<ResultSetHeader[]>(
-    `UPDATE users SET deleted_at = NOW() WHERE id = ?`,
+    `UPDATE users 
+    SET deleted_at = NOW() 
+    WHERE id = ? 
+    AND deleted_at IS NULL`,
     [userId]
   );
 
-  return result[0].affectedRows;
+  return result[0]?.affectedRows > 0;
 }
