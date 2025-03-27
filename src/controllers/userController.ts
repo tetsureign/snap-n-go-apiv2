@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import z from "zod";
-import { Jwt } from "jsonwebtoken";
 
 import { createUser, getUserByGoogleId, softDelUser } from "@/models/userModel";
-import { googleTokenVerifier } from "@/utils/googleTokenVerifier";
+import { googleTokenVerifier, jwtTokenGenerator } from "@/utils/userAuthUtils";
 
 import logger from "@/utils/logger";
 
@@ -52,13 +51,15 @@ export const handleCreateUserByGoogleId = async (
       name: validatedGoogleUser.data.name,
     });
 
-    // This code is not needed since we are using ON DUPLICATE KEY UPDATE
-    // if (!newUser)
-    //   return res
-    //     .status(409)
-    //     .json({ success: false, message: "User already exist." });
+    const { accessToken, refreshToken } = jwtTokenGenerator({
+      userId: newUser.id,
+      googleId: validatedGoogleUser.data.sub,
+      email: validatedGoogleUser.data.email,
+    });
 
-    return res.status(201).json({ success: true, data: newUser });
+    return res
+      .status(201)
+      .json({ success: true, data: newUser, accessToken, refreshToken });
   } catch (error) {
     logger.error(
       {

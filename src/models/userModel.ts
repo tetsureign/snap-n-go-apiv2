@@ -21,7 +21,7 @@ export async function createUser({
   googleId,
   email,
   name,
-}: CreateUserType): Promise<User | null> {
+}: CreateUserType): Promise<User> {
   const userId = uuidv4();
   await knex.raw(
     `INSERT INTO users (id, google_id, email, name, created_at) 
@@ -29,12 +29,12 @@ export async function createUser({
     ON DUPLICATE KEY UPDATE
       email = VALUES(email),
       name = VALUES(name),
-      deleted_at = NULL, 
-      created_at = NOW()`,
+      deleted_at = NULL`,
     [userId, googleId, email, name]
   );
 
-  return getUserByGoogleId(googleId);
+  // Pretty sure this CAN'T be null after the insert
+  return getUserByGoogleId(googleId) as Promise<User>;
 }
 
 export async function getUserByGoogleId(
