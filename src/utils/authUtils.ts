@@ -1,7 +1,13 @@
 import { OAuth2Client } from "google-auth-library";
 import * as jwt from "jsonwebtoken";
+import { getUserByGoogleId } from "@/models/userModel";
 
 import logger from "@/utils/logger";
+
+interface TokenSchema {
+  userId: string;
+  googleId: string;
+}
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const REFRESH_SECRET = process.env.REFRESH_SECRET!;
@@ -24,7 +30,7 @@ export const googleTokenVerifier = async (idToken: string) => {
   }
 };
 
-export const jwtTokenGenerator = (payload: object) => ({
+export const jwtTokenGenerator = (payload: TokenSchema) => ({
   accessToken: jwt.sign(payload, JWT_SECRET, {
     expiresIn: ACCESS_TOKEN_EXPIRY,
   }),
@@ -32,3 +38,22 @@ export const jwtTokenGenerator = (payload: object) => ({
     expiresIn: REFRESH_TOKEN_EXPIRY,
   }),
 });
+
+export const jwtTokenRefresher = async (token: string) => {
+  try {
+    const decoded = jwt.verify(token, REFRESH_SECRET) as TokenSchema;
+    const user = await getUserByGoogleId(decoded.googleId);
+    // Code 403
+    if (!user) throw new Error("Invalid token.");
+
+    const { accessToken, refreshToken } = jwtTokenGenerator({
+      userId: user.id,
+      googleId: user.google_id,
+    });
+
+    return { accessToken, refreshToken };
+  } catch {
+    // Code 403
+    throw new Error("Session expired, log in again.");
+  }
+};

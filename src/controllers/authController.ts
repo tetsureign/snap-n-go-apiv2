@@ -2,11 +2,15 @@ import { Request, Response } from "express";
 import z from "zod";
 
 import { createUser } from "@/models/userModel";
-import { googleTokenVerifier, jwtTokenGenerator } from "@/utils/authUtils";
+import {
+  googleTokenVerifier,
+  jwtTokenGenerator,
+  jwtTokenRefresher,
+} from "@/utils/authUtils";
 
 import logger from "@/utils/logger";
 
-const googleLoginReqBodySchema = z.object({
+const tokenReqBodySchema = z.object({
   token: z.string().min(1, "Oauth2 token is required."),
 });
 
@@ -17,7 +21,7 @@ const googleUserSchema = z.object({
 });
 
 export const handleLoginByGoogleId = async (req: Request, res: Response) => {
-  const validation = googleLoginReqBodySchema.safeParse(req.body);
+  const validation = tokenReqBodySchema.safeParse(req.body);
   if (!validation.success)
     return res
       .status(400)
@@ -43,7 +47,6 @@ export const handleLoginByGoogleId = async (req: Request, res: Response) => {
     const { accessToken, refreshToken } = jwtTokenGenerator({
       userId: newUser.id,
       googleId: validatedGoogleUser.data.sub,
-      email: validatedGoogleUser.data.email,
     });
 
     return res
@@ -65,4 +68,28 @@ export const handleLoginByGoogleId = async (req: Request, res: Response) => {
   }
 };
 
-export const handleRefreshToken = (req: Request, res: Response) => {};
+export const handleRefreshToken = async (req: Request, res: Response) => {
+  const validation = tokenReqBodySchema.safeParse(req.body);
+  if (!validation.success) {
+    return res
+      .status(400)
+      .json({ success: false, errors: validation.error.errors });
+  }
+
+  try {
+    const { accessToken, refreshToken } = await jwtTokenRefresher(
+      validation.data.token
+    );
+
+    return res.status(200).json({ success: true, accessToken, refreshToken });
+  } catch (error) {
+    logger.error(error, "Error refreshing token.");
+
+    if (error instanceof Error)
+      return res.status(401).json({ success: false, message: error.message });
+    else
+      return res
+        .status(500)
+        .json({ success: false, message: "Internal server error." });
+  }
+};

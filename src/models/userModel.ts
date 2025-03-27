@@ -22,7 +22,8 @@ export async function createUser({
   email,
   name,
 }: CreateUserType): Promise<User> {
-  const userId = uuidv4();
+  const userId = uuidv4(); // Only new users will have a new UUID
+
   await knex.raw(
     `INSERT INTO users (id, google_id, email, name, created_at) 
     VALUES (?, ?, ?, ?, NOW()) 
@@ -35,6 +36,16 @@ export async function createUser({
 
   // Pretty sure this CAN'T be null after the insert
   return getUserByGoogleId(googleId) as Promise<User>;
+}
+
+export async function getUserById(userId: string): Promise<User | null> {
+  const result = await knex.raw<User[][]>(
+    `SELECT * FROM users WHERE id = ? 
+    LIMIT 1`,
+    [userId]
+  );
+
+  return result[0]?.[0] ?? null;
 }
 
 export async function getUserByGoogleId(
