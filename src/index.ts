@@ -3,6 +3,7 @@ import cors from "cors";
 import "dotenv/config";
 
 import detectRouter from "@/routes/detectionRoute";
+import authRouter from "@/routes/authRoute";
 import userRouter from "@/routes/userRoute";
 import historyRouter from "@/routes/historyRoute";
 
@@ -23,6 +24,7 @@ app.use(express.json());
 const routePrefix = process.env.ROUTE_PREFIX;
 
 app.use(routePrefix + "/detect", detectRouter);
+app.use(routePrefix + "/auth", authRouter);
 app.use(routePrefix + "/user", userRouter);
 app.use(routePrefix + "/history", historyRouter);
 

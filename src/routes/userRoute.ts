@@ -1,15 +1,14 @@
 import express from "express";
 
 import {
-  handleCreateUserByGoogleId,
   handleGetUserByGoogleId,
   handleSoftDelUser,
 } from "@/controllers/userController";
 
 const userRouter = express.Router();
 
-userRouter.post("/google", handleCreateUserByGoogleId);
-userRouter.get("/:googleId", handleGetUserByGoogleId);
-userRouter.delete("/:id", handleSoftDelUser);
+// TODO: Add auth for those routes
+userRouter.get("/me/:googleId", handleGetUserByGoogleId);
+userRouter.delete("/me/delete/:id", handleSoftDelUser);
 
 export default userRouter;

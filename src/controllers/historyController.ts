@@ -8,17 +8,17 @@ import {
 
 import logger from "@/utils/logger";
 
-const addSearchQuerySchema = z.object({
+const addSearchQueryReqBodySchema = z.object({
   userId: z.string().uuid("Invalid user ID format."),
   query: z.string().min(1, "Search query is required."),
 });
 
-const getHistoryByUserIdSchema = z.object({
+const getHistoryByUserIdReqBodySchema = z.object({
   userId: z.string().uuid("Invalid user ID format."),
 });
 
 export const handleAddSearchHistory = async (req: Request, res: Response) => {
-  const validation = addSearchQuerySchema.safeParse(req.body);
+  const validation = addSearchQueryReqBodySchema.safeParse(req.body);
   if (!validation.success)
     return res
       .status(400)
@@ -38,7 +38,7 @@ export const handleAddSearchHistory = async (req: Request, res: Response) => {
 };
 
 export const handleGetHistoryByUserId = async (req: Request, res: Response) => {
-  const validation = getHistoryByUserIdSchema.safeParse(req.params);
+  const validation = getHistoryByUserIdReqBodySchema.safeParse(req.params);
   if (!validation.success) {
     return res
       .status(400)
