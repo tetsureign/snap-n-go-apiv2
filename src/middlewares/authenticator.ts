@@ -5,7 +5,7 @@ import { TokenSchema, RequestWithUserId } from "@/types";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
-export const routeAuthenticator = async (
+export const authenticator = async (
   req: RequestWithUserId,
   res: Response,
   next: NextFunction
