@@ -1,14 +1,15 @@
 import express from "express";
 
+import { authenticator } from "@/middlewares/authenticator";
+
 import {
-  handleGetUserByGoogleId,
+  handleGetMyInfo,
   handleSoftDelUser,
 } from "@/controllers/userController";
 
 const userRouter = express.Router();
 
-// TODO: Add auth for those routes and don't use id in the url
-userRouter.get("/me/:googleId", handleGetUserByGoogleId);
-userRouter.delete("/me/delete/:id", handleSoftDelUser);
+userRouter.get("/me", authenticator, handleGetMyInfo);
+userRouter.delete("/me/delete", authenticator, handleSoftDelUser);
 
 export default userRouter;

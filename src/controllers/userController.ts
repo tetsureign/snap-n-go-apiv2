@@ -1,27 +1,16 @@
-import { Request, Response } from "express";
-import z from "zod";
+import { Response } from "express";
 
-import { getUserByGoogleId, softDelUser } from "@/models/userModel";
+import { getUserById, softDelUser } from "@/models/userModel";
+import { AuthenticatedRequest } from "@/types";
 
 import logger from "@/utils/logger";
 
-const getUserByGoogleIdSchema = z.object({
-  googleId: z.string().min(1, "Google ID is required."),
-});
-
-const delUserSchema = z.object({
-  id: z.string().uuid("Invalid user ID."),
-});
-
-export const handleGetUserByGoogleId = async (req: Request, res: Response) => {
-  const validation = getUserByGoogleIdSchema.safeParse(req.params);
-  if (!validation.success)
-    return res
-      .status(400)
-      .json({ success: false, errors: validation.error.errors });
-
+export const handleGetMyInfo = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   try {
-    const user = await getUserByGoogleId(validation.data.googleId);
+    const user = await getUserById(req.user!.userId);
 
     if (!user) {
       return res
@@ -39,25 +28,23 @@ export const handleGetUserByGoogleId = async (req: Request, res: Response) => {
   }
 };
 
-export const handleSoftDelUser = async (req: Request, res: Response) => {
-  const validation = delUserSchema.safeParse(req.params);
-  if (!validation.success)
-    return res
-      .status(400)
-      .json({ success: false, errors: validation.error.errors });
-
+export const handleSoftDelUser = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   try {
-    const result = await softDelUser(validation.data.id);
+    const result = await softDelUser(req.user!.userId);
 
     if (!result) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found." });
+      return res.status(404).json({
+        success: false,
+        message: "User not found or already deleted.",
+      });
     }
 
     return res.json({ success: true });
   } catch (error) {
-    logger.error(error, "Error deleting user.");
+    logger.error(error, "Error soft deleting user.");
 
     return res
       .status(500)

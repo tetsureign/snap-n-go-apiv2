@@ -1,12 +1,12 @@
 import { Response, NextFunction } from "express";
 import * as jwt from "jsonwebtoken";
 
-import { TokenSchema, RequestWithUserId } from "@/types";
+import { TokenSchema, AuthenticatedRequest } from "@/types";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
 export const authenticator = async (
-  req: RequestWithUserId,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -17,7 +17,8 @@ export const authenticator = async (
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as TokenSchema;
 
-    req.userId = decoded.userId;
+    req.user = decoded;
+
     next();
   } catch {
     return res

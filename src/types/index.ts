@@ -5,6 +5,6 @@ export interface TokenSchema {
   googleId: string;
 }
 
-export interface RequestWithUserId extends Request {
-  userId: string;
+export interface AuthenticatedRequest extends Request {
+  user?: TokenSchema;
 }
