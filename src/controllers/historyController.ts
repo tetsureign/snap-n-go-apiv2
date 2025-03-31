@@ -1,31 +1,33 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import z from "zod";
 
 import {
   addSearchQuery,
   getUserSearchHistory,
 } from "@/models/searchHistoryModel";
+import { AuthenticatedRequest } from "@/types";
 
 import logger from "@/utils/logger";
 
-const addSearchQueryReqBodySchema = z.object({
-  userId: z.string().uuid("Invalid user ID format."),
+const addMySearchQueryReqBodySchema = z.object({
   query: z.string().min(1, "Search query is required."),
 });
 
-const getHistoryByUserIdReqBodySchema = z.object({
-  userId: z.string().uuid("Invalid user ID format."),
-});
-
-export const handleAddSearchHistory = async (req: Request, res: Response) => {
-  const validation = addSearchQueryReqBodySchema.safeParse(req.body);
+export const handleAddMySearchHistory = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  const validation = addMySearchQueryReqBodySchema.safeParse(req.body);
   if (!validation.success)
     return res
       .status(400)
       .json({ success: false, errors: validation.error.errors });
 
   try {
-    const newHistoryEntry = await addSearchQuery(validation.data);
+    const newHistoryEntry = await addSearchQuery({
+      userId: req.user!.userId,
+      query: validation.data.query,
+    });
 
     return res.status(201).json({ success: true, data: newHistoryEntry });
   } catch (error) {
@@ -37,16 +39,13 @@ export const handleAddSearchHistory = async (req: Request, res: Response) => {
   }
 };
 
-export const handleGetHistoryByUserId = async (req: Request, res: Response) => {
-  const validation = getHistoryByUserIdReqBodySchema.safeParse(req.params);
-  if (!validation.success) {
-    return res
-      .status(400)
-      .json({ success: false, errors: validation.error.errors });
-  }
-
+// TODO: Add pagination
+export const handleGetMyHistory = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
   try {
-    const entries = await getUserSearchHistory(validation.data.userId);
+    const entries = await getUserSearchHistory(req.user!.userId);
 
     if (!entries.length) {
       return res
