@@ -46,7 +46,7 @@ export const handleLoginByGoogleId = async (req: Request, res: Response) => {
 
     const { accessToken, refreshToken } = jwtTokenGenerator({
       userId: newUser.id,
-      googleId: validatedGoogleUser.data.sub,
+      googleId: newUser.google_id,
     });
 
     return res

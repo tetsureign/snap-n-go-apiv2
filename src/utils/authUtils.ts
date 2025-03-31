@@ -51,6 +51,6 @@ export const jwtTokenRefresher = async (token: string) => {
     return { accessToken, refreshToken };
   } catch {
     // Code 401
-    throw new Error("Session expired, log in again.");
+    throw new Error("Session expired or invalid token.");
   }
 };
