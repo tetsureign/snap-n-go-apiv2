@@ -1,15 +1,17 @@
 import express from "express";
 
 import {
-  handleAddMySearchHistory,
-  handleGetMyHistory,
+  handleAddMyQueryHistory,
+  handleGetMyHistoryLazy,
+  handleDeleteMyQueryHistory,
 } from "@/controllers/historyController";
 
 import { authenticator } from "@/middlewares/authenticator";
 
 const historyRouter = express.Router();
 
-historyRouter.post("/me", authenticator, handleAddMySearchHistory);
-historyRouter.get("/me", handleGetMyHistory);
+historyRouter.post("/me", authenticator, handleAddMyQueryHistory);
+historyRouter.get("/me", authenticator, handleGetMyHistoryLazy);
+historyRouter.delete("/me", authenticator, handleDeleteMyQueryHistory);
 
 export default historyRouter;
