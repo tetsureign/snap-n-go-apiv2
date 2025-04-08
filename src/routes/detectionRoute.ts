@@ -1,9 +1,10 @@
 import express from "express";
-import { handleDetection } from "../controllers/detectionController";
-import { UploadToTemp } from "../utils/uploadUtils";
 
-const router = express.Router();
+import { handleDetection } from "@/controllers/detectionController";
+import { UploadToTemp } from "@/utils/uploadUtils";
 
-router.post("/", UploadToTemp.single("image"), handleDetection);
+const detectRouter = express.Router();
 
-export default router;
+detectRouter.post("/", UploadToTemp.single("image"), handleDetection);
+
+export default detectRouter;

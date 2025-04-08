@@ -2,7 +2,10 @@ import { Request } from "express";
 import multer, { FileFilterCallback } from "multer";
 import path from "path";
 
+const SIZE_LIMIT = 5; // In Megabyte
+
 const memStorage = multer.memoryStorage();
+
 const tempStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "/tmp");
@@ -29,17 +32,18 @@ function fileFilter(
   }
 }
 
+const sizeLimitInByte = 1024 * 1024 * SIZE_LIMIT;
+
 export const UploadToMem = multer({
   storage: memStorage,
   fileFilter: fileFilter,
   // Only accepts <= 5MB
-  limits: { fileSize: 1024 * 1024 * 5 },
+  limits: { fileSize: sizeLimitInByte },
 });
 
 export const UploadToTemp = multer({
   storage: tempStorage,
   fileFilter: fileFilter,
   // Only accepts <= 5MB
-  // TODO: Make this dynamic
-  limits: { fileSize: 1024 * 1024 * 5 },
+  limits: { fileSize: sizeLimitInByte },
 });

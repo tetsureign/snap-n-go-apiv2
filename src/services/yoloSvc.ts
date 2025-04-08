@@ -2,6 +2,17 @@ import apiClient from "./yoloApiClient";
 import fs from "fs";
 import FormData from "form-data";
 
+interface DetectionResult {
+  object: string;
+  score: number;
+  coordinate: {
+    x0: number;
+    y0: number;
+    x1: number;
+    y1: number;
+  };
+}
+
 export const sendImageToYolo = async (imagePath: string) => {
   try {
     const formData = new FormData();
@@ -11,15 +22,16 @@ export const sendImageToYolo = async (imagePath: string) => {
       contentType: "image/jpeg",
     });
 
-    const response = await apiClient.post("/detect", formData, {
+    const response = await apiClient.post("/images/detect", formData, {
       headers: {
         ...formData.getHeaders(),
       },
     });
 
-    return response.data;
+    const detectionResult: DetectionResult[] = response.data;
+
+    return detectionResult;
   } catch (error) {
-    console.error("Error processing image:", error);
-    throw new Error("Error processing image: " + error);
+    throw new Error("Error sending image to microservice: " + error);
   }
 };
