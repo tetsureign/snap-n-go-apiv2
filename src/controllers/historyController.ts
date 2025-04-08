@@ -73,7 +73,7 @@ export const handleGetMyHistoryLazy = async (
 
     return res.json({ success: true, data: entries });
   } catch (error) {
-    logger.error(error, "Error fetching user's search history.");
+    logger.error({ error, req }, "Error fetching user's search history.");
 
     return res
       .status(500)
