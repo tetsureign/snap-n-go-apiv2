@@ -1,6 +1,7 @@
 import { Request } from "express";
 import multer, { FileFilterCallback } from "multer";
 import path from "path";
+import sanitize from "sanitize-filename";
 
 const SIZE_LIMIT = 5; // In Megabyte
 
@@ -12,7 +13,8 @@ const tempStorage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const extension = path.extname(file.originalname);
+    const sanitizedName = sanitize(file.originalname);
+    const extension = path.extname(sanitizedName);
     cb(null, file.fieldname + "-" + uniqueSuffix + extension);
   },
 });
@@ -23,27 +25,36 @@ function fileFilter(
   cb: FileFilterCallback
 ) {
   // Only accepts .png, .jpg, .jpeg, .bmp, .gif files
+  // Check MIME type too
+  const allowedMimes = [
+    "image/png",
+    "image/jpg",
+    "image/jpeg",
+    "image/bmp",
+    "image/gif",
+  ];
   const fileTypes = /.png|.jpg|.jpeg|.bmp|.gif/;
+
   const extName = fileTypes.test(path.extname(file.originalname).toLowerCase());
-  if (extName) {
+  const mimeValid = allowedMimes.includes(file.mimetype);
+
+  if (extName && mimeValid) {
     return cb(null, true);
   } else {
     cb(null, false);
   }
 }
 
-const sizeLimitInByte = 1024 * 1024 * SIZE_LIMIT;
+const sizeLimitByte = 1024 * 1024 * SIZE_LIMIT;
 
 export const UploadToMem = multer({
   storage: memStorage,
   fileFilter: fileFilter,
-  // Only accepts <= 5MB
-  limits: { fileSize: sizeLimitInByte },
+  limits: { fileSize: sizeLimitByte },
 });
 
 export const UploadToTemp = multer({
   storage: tempStorage,
   fileFilter: fileFilter,
-  // Only accepts <= 5MB
-  limits: { fileSize: sizeLimitInByte },
+  limits: { fileSize: sizeLimitByte },
 });
