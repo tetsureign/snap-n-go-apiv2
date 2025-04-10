@@ -4,12 +4,13 @@ import path from "path";
 import sanitize from "sanitize-filename";
 
 const SIZE_LIMIT = 5; // In Megabyte
+const UPLOAD_TEMP_DIR = process.env.UPLOAD_TEMP_DIR || "/tmp";
 
 const memStorage = multer.memoryStorage();
 
 const tempStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "/tmp");
+    cb(null, UPLOAD_TEMP_DIR);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
