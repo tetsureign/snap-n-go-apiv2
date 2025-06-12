@@ -1,16 +1,18 @@
-import express from "express";
-import cors from "cors";
-import rateLimit from "express-rate-limit";
-import helmet from "helmet";
 import "dotenv/config";
 
-import detectRouter from "@/routes/detectionRoute";
-import authRouter from "@/routes/authRoute";
-import userRouter from "@/routes/userRoute";
-import historyRouter from "@/routes/historyRoute";
+import cors from "cors";
+import express from "express";
+import rateLimit from "express-rate-limit";
+import fastify from "fastify";
+import fastifyExpress from "@fastify/express";
+import helmet from "helmet";
 
-import logger from "@/utils/logger";
 import errorHandler from "@/middlewares/errorHandler";
+import authRouter from "@/routes/authRoute";
+import detectRouter from "@/routes/detectionRoute";
+import historyRouter from "@/routes/historyRoute";
+import userRouter from "@/routes/userRoute";
+import logger from "@/utils/logger";
 
 const RATE_LIMITER_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 const RATE_LIMITER_MAX = 100; // Limit each IP to 100 requests per windowMs

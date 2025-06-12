@@ -2,6 +2,10 @@ import knex from "db";
 import { ResultSetHeader } from "mysql2";
 import { v4 as uuidv4 } from "uuid";
 
+import { PrismaClient } from "generated/prisma";
+
+const prisma = new PrismaClient();
+
 export interface SearchHistory {
   id: string;
   user_id: string;
@@ -10,15 +14,13 @@ export interface SearchHistory {
   deleted_at?: Date;
 }
 
-type AddQueryType = {
-  userId: string;
-  query: string;
-};
-
 export async function addSearchQueryHistory({
   userId,
   query,
-}: AddQueryType): Promise<SearchHistory> {
+}: {
+  userId: string;
+  query: string;
+}): Promise<SearchHistory> {
   const queryId = uuidv4();
 
   await knex.raw(
