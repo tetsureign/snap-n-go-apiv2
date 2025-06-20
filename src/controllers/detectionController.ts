@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import fs from "fs";
-import { sendImageToYolo } from "@/services/yoloService";
+import { sendImageToYolo } from "@/services/detectionService";
 import { pathChecking } from "@/utils/pathChecking";
 
 export const handleDetection = async (
