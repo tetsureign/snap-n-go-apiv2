@@ -1,14 +1,12 @@
-import { Request, Response, NextFunction } from "express";
-import logger from "@/utils/logger";
+import { FastifyError, FastifyReply, FastifyRequest } from "fastify";
 
-function errorHandler(
-  err: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
+export default function errorHandler(
+  error: FastifyError,
+  request: FastifyRequest,
+  reply: FastifyReply
 ) {
-  logger.error(`Error on ${req.method} ${req.url}: ${err.message}`);
-  res.status(500).json({ error: "Internal Server Error" });
+  request.log.error(
+    `Error on ${request.method} ${request.url}: ${error.message}`
+  );
+  reply.status(500).send({ error: "Internal Server Error" });
 }
-
-export default errorHandler;

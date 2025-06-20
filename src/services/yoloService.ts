@@ -1,4 +1,4 @@
-import apiClient from "./yoloApiClient";
+import yoloApiClient from "@/utils/yoloApiClient";
 import fs from "fs";
 import FormData from "form-data";
 
@@ -26,7 +26,7 @@ export const sendImageToYolo = async (imagePath: string) => {
       contentType: "image/*",
     });
 
-    const response = await apiClient.post("/images/detect", formData, {
+    const response = await yoloApiClient.post("/images/detect", formData, {
       headers: {
         ...formData.getHeaders(),
       },

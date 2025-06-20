@@ -1,15 +1,17 @@
-import express from "express";
-
+import { FastifyPluginAsync } from "fastify";
 import { authenticator } from "@/middlewares/authenticator";
-
 import {
   handleGetMyInfo,
   handleSoftDelUser,
 } from "@/controllers/userController";
 
-const userRouter = express.Router();
-
-userRouter.get("/me", authenticator, handleGetMyInfo);
-userRouter.delete("/me/delete", authenticator, handleSoftDelUser);
+const userRouter: FastifyPluginAsync = async (fastify) => {
+  fastify.get("/me", { preHandler: authenticator }, handleGetMyInfo);
+  fastify.delete(
+    "/me/delete",
+    { preHandler: authenticator },
+    handleSoftDelUser
+  );
+};
 
 export default userRouter;

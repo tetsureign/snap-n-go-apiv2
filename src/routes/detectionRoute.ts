@@ -1,10 +1,8 @@
-import express from "express";
-
+import { FastifyPluginAsync } from "fastify";
 import { handleDetection } from "@/controllers/detectionController";
-import { UploadToTemp } from "@/utils/uploadUtils";
 
-const detectRouter = express.Router();
-
-detectRouter.post("/", UploadToTemp.single("image"), handleDetection);
+const detectRouter: FastifyPluginAsync = async (fastify) => {
+  fastify.post("/", handleDetection);
+};
 
 export default detectRouter;

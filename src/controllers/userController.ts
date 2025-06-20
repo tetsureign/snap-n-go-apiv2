@@ -1,53 +1,48 @@
-import { Response } from "express";
-
-import { getUserById, softDelUser } from "@/models/userModel";
+import { FastifyReply } from "fastify";
 import { AuthenticatedRequest } from "@/types";
-
-import logger from "@/utils/logger";
+import { getUserById, softDeleteUser } from "@/services/userService";
 
 export const handleGetMyInfo = async (
   req: AuthenticatedRequest,
-  res: Response
+  reply: FastifyReply
 ) => {
   try {
     const user = await getUserById(req.user!.userId);
 
     if (!user) {
-      return res
+      return reply
         .status(404)
-        .json({ success: false, message: "User not found." });
+        .send({ success: false, message: "User not found." });
     }
 
-    return res.json({ success: true, data: user });
+    return reply.send({ success: true, data: user });
   } catch (error) {
-    logger.error(error, "Error fetching user.");
-
-    return res
+    req.log.error(error, "Error fetching user.");
+    return reply
       .status(500)
-      .json({ success: false, message: "Internal server error." });
+      .send({ success: false, message: "Internal server error." });
   }
 };
 
 export const handleSoftDelUser = async (
   req: AuthenticatedRequest,
-  res: Response
+  reply: FastifyReply
 ) => {
   try {
-    const result = await softDelUser(req.user!.userId);
+    const result = await softDeleteUser(req.user!.userId);
 
     if (!result) {
-      return res.status(404).json({
+      return reply.status(404).send({
         success: false,
         message: "User not found or already deleted.",
       });
     }
 
-    return res.json({ success: true });
+    return reply.send({ success: true });
   } catch (error) {
-    logger.error(error, "Error soft deleting user.");
-
-    return res
+    req.log.error(error, "Error soft deleting user.");
+    return reply
       .status(500)
-      .json({ success: false, message: "Internal server error." });
+      .send({ success: false, message: "Internal server error." });
   }
 };

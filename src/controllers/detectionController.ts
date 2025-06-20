@@ -1,47 +1,50 @@
-import { Request, Response } from "express";
+import { FastifyRequest, FastifyReply } from "fastify";
 import fs from "fs";
-
-import { sendImageToYolo } from "@/services/yoloSvc";
+import { sendImageToYolo } from "@/services/yoloService";
 import { pathChecking } from "@/utils/pathChecking";
-import logger from "@/utils/logger";
 
-export const handleDetection = async (req: Request, res: Response) => {
-  const filePath = req.file?.path;
-
-  if (filePath) {
-    try {
-      const normalizedPath = pathChecking(filePath);
-
-      const detectionResult = await sendImageToYolo(normalizedPath);
-
-      res.json({ success: true, data: detectionResult });
-
-      fs.unlink(normalizedPath, (err) => {
-        err && logger.error(err, "Failed to delete file.");
-      });
-    } catch (error) {
-      logger.error(error, "Error handling detection.");
-
-      try {
-        const safePathToDel = pathChecking(filePath);
-        fs.unlink(safePathToDel, (err) => {
-          err && logger.error(error, "Failed to delete file.");
-        });
-      } catch (deleteError) {
-        logger.error(deleteError, "Failed to validate path for deletion.");
-      }
-
-      if (error instanceof Error) {
-        res.status(500).json({ success: false, message: error.message });
-      } else {
-        res
-          .status(500)
-          .json({ success: false, message: "Internal server error." });
-      }
-    }
-  } else {
-    return res
+export const handleDetection = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  // Fastify multipart: req.file() returns a promise with the file stream
+  const data = await req.file();
+  if (!data) {
+    return reply
       .status(400)
-      .json({ success: false, message: "No file uploaded" });
+      .send({ success: false, message: "No file uploaded" });
+  }
+
+  // Save file to disk
+  const tempPath = `/tmp/${Date.now()}-${data.filename}`;
+  const writeStream = fs.createWriteStream(tempPath);
+  await new Promise((resolve, reject) => {
+    data.file.pipe(writeStream);
+    data.file.on("end", resolve);
+    data.file.on("error", reject);
+  });
+
+  try {
+    const normalizedPath = pathChecking(tempPath);
+    const detectionResult = await sendImageToYolo(normalizedPath);
+
+    reply.send({ success: true, data: detectionResult });
+
+    fs.unlink(normalizedPath, (err) => {
+      err && req.log.error(err, "Failed to delete file.");
+    });
+  } catch (error) {
+    req.log.error(error, "Error handling detection.");
+    try {
+      const safePathToDel = pathChecking(tempPath);
+      fs.unlink(safePathToDel, (err) => {
+        err && req.log.error(error, "Failed to delete file.");
+      });
+    } catch (deleteError) {
+      req.log.error(deleteError, "Failed to validate path for deletion.");
+    }
+    reply
+      .status(500)
+      .send({ success: false, message: (error as Error).message });
   }
 };

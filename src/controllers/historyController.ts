@@ -1,14 +1,11 @@
-import { Response } from "express";
+import { FastifyReply } from "fastify";
 import z from "zod";
-
 import {
   addSearchQueryHistory,
   getUserQueryHistoryLazy,
   softDelQueryHistory,
-} from "@/models/searchHistoryModel";
+} from "@/services/historyService";
 import { AuthenticatedRequest } from "@/types";
-
-import logger from "@/utils/logger";
 
 const addMySearchQuerySchema = z.object({
   query: z.string().min(1, "Search query is required."),
@@ -28,13 +25,13 @@ const delMyQuerySchema = z.object({
 
 export const handleAddMyQueryHistory = async (
   req: AuthenticatedRequest,
-  res: Response
+  reply: FastifyReply
 ) => {
   const validation = addMySearchQuerySchema.safeParse(req.body);
   if (!validation.success)
-    return res
+    return reply
       .status(400)
-      .json({ success: false, errors: validation.error.errors });
+      .send({ success: false, errors: validation.error.errors });
 
   try {
     const newHistoryEntry = await addSearchQueryHistory({
@@ -42,26 +39,25 @@ export const handleAddMyQueryHistory = async (
       query: validation.data.query,
     });
 
-    return res.status(201).json({ success: true, data: newHistoryEntry });
+    return reply.status(201).send({ success: true, data: newHistoryEntry });
   } catch (error) {
-    logger.error(error, "Error adding search history.");
-
-    return res
+    req.log.error(error, "Error adding search history.");
+    return reply
       .status(500)
-      .json({ success: false, message: "Internal server error" });
+      .send({ success: false, message: "Internal server error" });
   }
 };
 
 export const handleGetMyHistoryLazy = async (
   req: AuthenticatedRequest,
-  res: Response
+  reply: FastifyReply
 ) => {
   try {
     const validation = getMyHistoryLazySchema.safeParse(req.query);
     if (!validation.success)
-      return res
+      return reply
         .status(400)
-        .json({ success: false, errors: validation.error.errors });
+        .send({ success: false, errors: validation.error.errors });
 
     const { limit, cursor } = validation.data;
 
@@ -71,41 +67,42 @@ export const handleGetMyHistoryLazy = async (
       cursor
     );
 
-    return res.json({ success: true, data: entries });
+    return reply.send({ success: true, data: entries });
   } catch (error) {
-    logger.error({ error, req }, "Error fetching user's search history.");
-
-    return res
+    req.log.error({ error, req }, "Error fetching user's search history.");
+    return reply
       .status(500)
-      .json({ success: false, message: "Internal server error." });
+      .send({ success: false, message: "Internal server error." });
   }
 };
 
 export const handleDeleteMyQueryHistory = async (
   req: AuthenticatedRequest,
-  res: Response
+  reply: FastifyReply
 ) => {
   const validation = delMyQuerySchema.safeParse(req.body);
   if (!validation.success)
-    return res
+    return reply
       .status(400)
-      .json({ success: false, errors: validation.error.errors });
+      .send({ success: false, errors: validation.error.errors });
 
   try {
-    const result = softDelQueryHistory(req.user!.userId, validation.data.ids);
+    const result = await softDelQueryHistory(
+      req.user!.userId,
+      validation.data.ids
+    );
 
     if (!result)
-      return res.status(404).json({
+      return reply.status(404).send({
         success: false,
         message: "History entries not found or already deleted.",
       });
 
-    return res.json({ success: true, message: `${result} entries deleted.` });
+    return reply.send({ success: true, message: `${result} entries deleted.` });
   } catch (error) {
-    logger.error(error, "Error soft deleting history.");
-
-    return res
+    req.log.error(error, "Error soft deleting history.");
+    return reply
       .status(500)
-      .json({ success: false, message: "Internal server error." });
+      .send({ success: false, message: "Internal server error." });
   }
 };
