@@ -1,6 +1,12 @@
 import "dotenv/config";
 
 import fastify from "fastify";
+import {
+  createJsonSchemaTransform,
+  jsonSchemaTransform,
+  serializerCompiler,
+  validatorCompiler,
+} from "fastify-type-provider-zod";
 
 import errorHandler from "@/middlewares/errorHandler";
 import authRouter from "@/routes/authRoute";
@@ -39,6 +45,9 @@ const app = fastify({
 });
 
 async function bootstrap() {
+  app.setValidatorCompiler(validatorCompiler);
+  app.setSerializerCompiler(serializerCompiler);
+
   // Register plugins
   await app.register(rateLimit, {
     max: RATE_LIMITER_MAX,
@@ -62,14 +71,16 @@ async function bootstrap() {
         description: "API documentation for Snap & Go",
         version: "2.0.0",
       },
+      servers: [],
     },
+    transform: jsonSchemaTransform,
   });
   await app.register(swaggerUI, {
     routePrefix: "/docs",
-    uiConfig: {
-      docExpansion: "full",
-      deepLinking: false,
-    },
+    // uiConfig: {
+    // docExpansion: "full",
+    // deepLinking: false,
+    // },
   });
 
   // Error handler
