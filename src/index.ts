@@ -76,10 +76,6 @@ async function bootstrap() {
   });
   await app.register(swaggerUI, {
     routePrefix: "/docs",
-    // uiConfig: {
-    // docExpansion: "full",
-    // deepLinking: false,
-    // },
   });
 
   // Error handler

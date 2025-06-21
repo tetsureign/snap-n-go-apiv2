@@ -1,4 +1,4 @@
-import { restore } from "@/utils/softDelete";
+import { restore } from "@/libs/softDelete";
 import prisma from "prisma/client";
 import { z } from "zod/v4";
 

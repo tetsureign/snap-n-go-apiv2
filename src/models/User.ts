@@ -1,7 +1,7 @@
 import prisma from "prisma/client";
 import { z } from "zod/v4";
 
-import { restore, softDelete } from "@/utils/softDelete";
+import { restore, softDelete } from "@/libs/softDelete";
 
 export const userSchema = z.object({
   id: z.string(),
