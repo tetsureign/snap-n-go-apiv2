@@ -1,18 +1,9 @@
 import { FastifyPluginAsync } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
-import { z } from "zod/v4";
-import { handleDetection } from "@/controllers/detectionController";
 
-const detectionResult = z.object({
-  object: z.string(),
-  score: z.number(),
-  coordinate: z.object({
-    x0: z.number(),
-    y0: z.number(),
-    x1: z.number(),
-    y1: z.number(),
-  }),
-});
+import { handleDetection } from "@/controllers/detectionController";
+import { detectionResult } from "@/types/detectionSchemas";
+import { badRequest, ok } from "@/types/zodResponseSchemas";
 
 const detectRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().post(
@@ -22,18 +13,9 @@ const detectRouter: FastifyPluginAsync = async (fastify) => {
         description: "Detect objects in an uploaded image",
         tags: ["Detection"],
         consumes: ["multipart/form-data"],
-        // body: z.object({
-        //   file: z.unknown(), // Fastify multipart doesn't validate file type with zod
-        // }),
         response: {
-          200: z.object({
-            success: z.boolean(),
-            data: z.array(detectionResult),
-          }),
-          400: z.object({
-            success: z.boolean(),
-            message: z.string(),
-          }),
+          200: ok(detectionResult),
+          400: badRequest,
         },
       },
     },

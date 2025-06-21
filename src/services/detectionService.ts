@@ -1,19 +1,12 @@
-import yoloApiClient from "@/utils/yoloApiClient";
-import fs from "fs";
 import FormData from "form-data";
+import fs from "fs";
+import { z } from "zod/v4";
 
+import { detectionResult } from "@/types/detectionSchemas";
 import { pathChecking } from "@/utils/pathChecking";
+import yoloApiClient from "@/utils/yoloApiClient";
 
-interface DetectionResult {
-  object: string;
-  score: number;
-  coordinate: {
-    x0: number;
-    y0: number;
-    x1: number;
-    y1: number;
-  };
-}
+type DetectionResult = z.infer<typeof detectionResult>;
 
 export const sendImageToYolo = async (imagePath: string) => {
   try {

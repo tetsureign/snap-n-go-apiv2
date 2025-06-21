@@ -29,3 +29,16 @@ export const forbidden = z.object({
   success: z.literal(false).default(false),
   message: z.string().default("Forbidden"),
 });
+
+export const badRequest = z.object({
+  success: z.literal(false).default(false),
+  message: z.string().default("Bad request"),
+});
+
+export const userCreated = <T>(objectSchema: T) =>
+  z.object({
+    success: z.boolean(),
+    data: objectSchema,
+    accessToken: z.string(),
+    refreshToken: z.string(),
+  });

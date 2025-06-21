@@ -12,7 +12,7 @@ import {
   addMySearchQuerySchema,
   delMyQuerySchema,
   getMyHistoryLazySchema,
-} from "@/types/historySchemas";
+} from "@/types/historyRequestSchemas";
 import { notFound, ok, okEmpty } from "@/types/zodResponseSchemas";
 
 const historyRouter: FastifyPluginAsync = async (fastify) => {

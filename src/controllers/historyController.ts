@@ -11,7 +11,7 @@ import {
   addMySearchQuerySchema,
   delMyQuerySchema,
   getMyHistoryLazySchema,
-} from "@/types/historySchemas";
+} from "@/types/historyRequestSchemas";
 import {
   internalError,
   notFound,

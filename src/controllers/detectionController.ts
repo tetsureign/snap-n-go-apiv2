@@ -1,6 +1,8 @@
-import { FastifyRequest, FastifyReply } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import fs from "fs";
+
 import { sendImageToYolo } from "@/services/detectionService";
+import { badRequest, internalError, ok } from "@/types/zodResponseSchemas";
 import { pathChecking } from "@/utils/pathChecking";
 
 export const handleDetection = async (
@@ -12,7 +14,7 @@ export const handleDetection = async (
   if (!data) {
     return reply
       .status(400)
-      .send({ success: false, message: "No file uploaded" });
+      .send(badRequest.parse({ message: "No file uploaded" }));
   }
 
   // Save file to disk
@@ -28,7 +30,7 @@ export const handleDetection = async (
     const normalizedPath = pathChecking(tempPath);
     const detectionResult = await sendImageToYolo(normalizedPath);
 
-    reply.send({ success: true, data: detectionResult });
+    reply.send(ok(detectionResult).parse({ data: detectionResult }));
 
     fs.unlink(normalizedPath, (err) => {
       err && req.log.error(err, "Failed to delete file.");
@@ -43,8 +45,6 @@ export const handleDetection = async (
     } catch (deleteError) {
       req.log.error(deleteError, "Failed to validate path for deletion.");
     }
-    reply
-      .status(500)
-      .send({ success: false, message: (error as Error).message });
+    reply.status(500).send(internalError.parse({}));
   }
 };
