@@ -4,6 +4,7 @@ import fs from "fs";
 import { sendImageToYolo } from "@/services/detectionService";
 import { badRequest, internalError, ok } from "@/types/zodResponseSchemas";
 import { pathChecking } from "@/utils/pathChecking";
+import { detectionResult as detectionResultSchema } from "@/types/detectionSchemas";
 
 export const handleDetection = async (
   req: FastifyRequest,
@@ -30,7 +31,7 @@ export const handleDetection = async (
     const normalizedPath = pathChecking(tempPath);
     const detectionResult = await sendImageToYolo(normalizedPath);
 
-    reply.send(ok(detectionResult).parse({ data: detectionResult }));
+    reply.send(ok(detectionResultSchema).parse({ data: detectionResult }));
 
     fs.unlink(normalizedPath, (err) => {
       err && req.log.error(err, "Failed to delete file.");

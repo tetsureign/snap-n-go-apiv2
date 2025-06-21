@@ -1,6 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod/v4";
 
+import { userSchema } from "@/models/User";
 import { loginWithGoogleToken, refreshToken } from "@/services/authService";
 import { tokenBodySchema } from "@/types/authSchemas";
 import {
@@ -23,7 +24,7 @@ export const handleLoginByGoogleId = async (
     } = await loginWithGoogleToken(req.body.token);
 
     return reply.status(201).send(
-      userCreated(user).parse({
+      userCreated(userSchema).parse({
         data: user,
         accessToken,
         refreshToken: refresh,
