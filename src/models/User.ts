@@ -1,5 +1,18 @@
 import prisma from "prisma/client";
-import { softDelete, restore } from "@/utils/softDelete";
+import { z } from "zod/v4";
+
+import { restore, softDelete } from "@/utils/softDelete";
+
+export const userSchema = z.object({
+  id: z.string(),
+  googleId: z.string(),
+  email: z.string(),
+  name: z.string(),
+  createdAt: z.string(),
+  deletedAt: z.string().nullable(),
+});
+
+export type UserDTO = z.infer<typeof userSchema>;
 
 export class User {
   id!: string;

@@ -2,7 +2,6 @@ import "dotenv/config";
 
 import fastify from "fastify";
 import {
-  createJsonSchemaTransform,
   jsonSchemaTransform,
   serializerCompiler,
   validatorCompiler,

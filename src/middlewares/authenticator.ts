@@ -1,6 +1,8 @@
 import { FastifyReply } from "fastify";
 import * as jwt from "jsonwebtoken";
+
 import { AuthenticatedRequest, TokenSchema } from "@/types";
+import { forbidden, unauthorized } from "@/types/zodResponseSchemas";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -10,7 +12,7 @@ export const authenticator = async (
 ) => {
   const token = request.headers.authorization?.split(" ")[1];
   if (!token) {
-    return reply.status(401).send({ success: false, message: "Unauthorized." });
+    return reply.status(401).send(unauthorized.parse({}));
   }
 
   try {
@@ -19,6 +21,6 @@ export const authenticator = async (
   } catch {
     return reply
       .status(403)
-      .send({ success: false, message: "Invalid or expired token." });
+      .send(forbidden.parse({ message: "Invalid or expired token" }));
   }
 };

@@ -1,20 +1,13 @@
 import { FastifyPluginAsync } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
-import { z } from "zod/v4";
-import { authenticator } from "@/middlewares/authenticator";
+
 import {
   handleGetMyInfo,
   handleSoftDelUser,
 } from "@/controllers/userController";
-
-const userSchema = z.object({
-  id: z.string(),
-  googleId: z.string(),
-  email: z.string(),
-  name: z.string(),
-  createdAt: z.string(),
-  deletedAt: z.string().nullable(),
-});
+import { authenticator } from "@/middlewares/authenticator";
+import { userSchema } from "@/models/User";
+import { notFound, ok, okEmpty } from "@/types/zodResponseSchemas";
 
 const userRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().get(
@@ -25,14 +18,8 @@ const userRouter: FastifyPluginAsync = async (fastify) => {
         description: "Get current user info",
         tags: ["User"],
         response: {
-          200: z.object({
-            success: z.boolean(),
-            data: userSchema,
-          }),
-          404: z.object({
-            success: z.boolean(),
-            message: z.string(),
-          }),
+          200: ok(userSchema),
+          404: notFound,
         },
       },
     },
@@ -46,13 +33,8 @@ const userRouter: FastifyPluginAsync = async (fastify) => {
         description: "Soft delete current user",
         tags: ["User"],
         response: {
-          200: z.object({
-            success: z.boolean(),
-          }),
-          404: z.object({
-            success: z.boolean(),
-            message: z.string(),
-          }),
+          200: okEmpty,
+          404: notFound,
         },
       },
     },
