@@ -1,30 +1,19 @@
 import { FastifyPluginAsync } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
-import { z } from "zod/v4";
+
 import {
   handleAddMyQueryHistory,
-  handleGetMyHistoryLazy,
   handleDeleteMyQueryHistory,
+  handleGetMyHistoryLazy,
 } from "@/controllers/historyController";
 import { authenticator } from "@/middlewares/authenticator";
-
-const addMySearchQuerySchema = z.object({
-  query: z.string().min(1, "Search query is required."),
-});
-const getMyHistoryLazySchema = z.object({
-  limit: z.coerce.number().min(1).max(100),
-  cursor: z.string().uuid().optional(),
-});
-const delMyQuerySchema = z.object({
-  ids: z.array(z.string().uuid()).min(1, "At least one ID is required."),
-});
-const historyEntry = z.object({
-  id: z.string(),
-  userId: z.string(),
-  searchQuery: z.string(),
-  createdAt: z.string(),
-  deletedAt: z.string().nullable(),
-});
+import { historySchema } from "@/models/SearchHistory";
+import {
+  addMySearchQuerySchema,
+  delMyQuerySchema,
+  getMyHistoryLazySchema,
+} from "@/types/historySchemas";
+import { notFound, ok, okEmpty } from "@/types/zodResponseSchemas";
 
 const historyRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().post(
@@ -34,10 +23,7 @@ const historyRouter: FastifyPluginAsync = async (fastify) => {
       schema: {
         body: addMySearchQuerySchema,
         response: {
-          201: z.object({
-            success: z.boolean(),
-            data: historyEntry,
-          }),
+          201: ok(historySchema),
         },
         tags: ["History"],
         description: "Add a search query to history",
@@ -53,10 +39,7 @@ const historyRouter: FastifyPluginAsync = async (fastify) => {
       schema: {
         querystring: getMyHistoryLazySchema,
         response: {
-          200: z.object({
-            success: z.boolean(),
-            data: z.array(historyEntry),
-          }),
+          200: ok(historySchema),
         },
         tags: ["History"],
         description: "Get user's search history (paginated)",
@@ -72,14 +55,8 @@ const historyRouter: FastifyPluginAsync = async (fastify) => {
       schema: {
         body: delMyQuerySchema,
         response: {
-          200: z.object({
-            success: z.boolean(),
-            message: z.string(),
-          }),
-          404: z.object({
-            success: z.boolean(),
-            message: z.string(),
-          }),
+          200: okEmpty,
+          404: notFound,
         },
         tags: ["History"],
         description: "Soft delete search history entries",

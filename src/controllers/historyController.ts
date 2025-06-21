@@ -1,36 +1,53 @@
 import { FastifyReply } from "fastify";
+import { z } from "zod/v4";
+
 import {
   addSearchQueryHistory,
   getUserQueryHistoryLazy,
   softDelQueryHistory,
 } from "@/services/historyService";
 import { AuthenticatedRequest } from "@/types";
+import {
+  addMySearchQuerySchema,
+  delMyQuerySchema,
+  getMyHistoryLazySchema,
+} from "@/types/historySchemas";
+import {
+  internalError,
+  notFound,
+  ok,
+  okEmpty,
+} from "@/types/zodResponseSchemas";
+
+type AddMyQueryBody = z.infer<typeof addMySearchQuerySchema>;
+type GetMyHistoryQuery = z.infer<typeof getMyHistoryLazySchema>;
+type DeleteMyHistoryBody = z.infer<typeof delMyQuerySchema>;
 
 export const handleAddMyQueryHistory = async (
-  req: AuthenticatedRequest,
+  req: AuthenticatedRequest<{ Body: AddMyQueryBody }>,
   reply: FastifyReply
 ) => {
   try {
     const newHistoryEntry = await addSearchQueryHistory({
-      userId: req.user!.userId,
-      query: (req.body as any).query,
+      userId: req.user!.userId, // user is ensured through the auth middleware
+      query: req.body.query,
     });
 
-    return reply.status(201).send({ success: true, data: newHistoryEntry });
+    return reply
+      .status(201)
+      .send(ok(newHistoryEntry).parse({ data: newHistoryEntry }));
   } catch (error) {
     req.log.error(error, "Error adding search history.");
-    return reply
-      .status(500)
-      .send({ success: false, message: "Internal server error" });
+    return reply.status(500).send(internalError.parse({}));
   }
 };
 
 export const handleGetMyHistoryLazy = async (
-  req: AuthenticatedRequest,
+  req: AuthenticatedRequest<{ Querystring: GetMyHistoryQuery }>,
   reply: FastifyReply
 ) => {
   try {
-    const { limit, cursor } = req.query as any;
+    const { limit, cursor } = req.query;
 
     const entries = await getUserQueryHistoryLazy(
       req.user!.userId,
@@ -38,36 +55,30 @@ export const handleGetMyHistoryLazy = async (
       cursor
     );
 
-    return reply.send({ success: true, data: entries });
+    return reply.send(ok(entries).parse({ data: entries }));
   } catch (error) {
     req.log.error({ error, req }, "Error fetching user's search history.");
-    return reply
-      .status(500)
-      .send({ success: false, message: "Internal server error." });
+    return reply.status(500).send(internalError.parse({}));
   }
 };
 
 export const handleDeleteMyQueryHistory = async (
-  req: AuthenticatedRequest,
+  req: AuthenticatedRequest<{ Body: DeleteMyHistoryBody }>,
   reply: FastifyReply
 ) => {
   try {
-    const result = await softDelQueryHistory(
-      req.user!.userId,
-      (req.body as any).ids
-    );
+    const result = await softDelQueryHistory(req.user!.userId, req.body.ids);
 
     if (!result)
-      return reply.status(404).send({
-        success: false,
-        message: "History entries not found or already deleted.",
-      });
+      return reply.status(404).send(
+        notFound.parse({
+          message: "History entries not found or already deleted.",
+        })
+      );
 
-    return reply.send({ success: true, message: `${result} entries deleted.` });
+    return reply.send(okEmpty.parse({}));
   } catch (error) {
     req.log.error(error, "Error soft deleting history.");
-    return reply
-      .status(500)
-      .send({ success: false, message: "Internal server error." });
+    return reply.status(500).send(internalError.parse({}));
   }
 };

@@ -1,5 +1,16 @@
 import { restore } from "@/utils/softDelete";
 import prisma from "prisma/client";
+import { z } from "zod/v4";
+
+export const historySchema = z.object({
+  id: z.string(),
+  userId: z.string(),
+  searchQuery: z.string(),
+  createdAt: z.string(),
+  deletedAt: z.string().nullable(),
+});
+
+export type historyDTO = z.infer<typeof historySchema>;
 
 export class SearchHistory {
   id!: string;
