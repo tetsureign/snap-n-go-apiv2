@@ -37,8 +37,14 @@ export const badRequest = z.object({
 
 export const userCreated = <T>(objectSchema: T) =>
   z.object({
-    success: z.boolean(),
+    success: z.literal(true).default(true),
     data: objectSchema,
     accessToken: z.string(),
     refreshToken: z.string(),
   });
+
+export const tokenRefreshed = z.object({
+  success: z.literal(true).default(true),
+  accessToken: z.string(),
+  refreshToken: z.string(),
+});

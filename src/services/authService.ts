@@ -1,9 +1,9 @@
+import { createOrUpdateUser } from "@/services/userService";
 import {
   googleTokenVerifier,
   jwtTokenGenerator,
   jwtTokenRefresher,
 } from "@/utils/authUtils";
-import { createOrUpdateUser } from "@/services/userService";
 
 export async function loginWithGoogleToken(token: string) {
   const googleUser = await googleTokenVerifier(token);
