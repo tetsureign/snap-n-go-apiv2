@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiClient = axios.create({
+const yoloApiClient = axios.create({
   baseURL: process.env.YOLO_SERVICE_URL,
   timeout: 5000,
   headers: {
@@ -9,7 +9,7 @@ const apiClient = axios.create({
 });
 
 // Response Interceptor
-apiClient.interceptors.response.use(
+yoloApiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     console.error("YOLO API Error:", error);
@@ -17,4 +17,4 @@ apiClient.interceptors.response.use(
   }
 );
 
-export default apiClient;
+export default yoloApiClient;

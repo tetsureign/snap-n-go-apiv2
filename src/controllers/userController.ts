@@ -1,53 +1,52 @@
-import { Response } from "express";
+import { FastifyReply } from "fastify";
 
-import { getUserById, softDelUser } from "@/models/userModel";
+import { userSchema } from "@/models/User";
+import { getUserById, softDeleteUser } from "@/services/userService";
 import { AuthenticatedRequest } from "@/types";
-
-import logger from "@/utils/logger";
+import {
+  internalError,
+  notFound,
+  ok,
+  okEmpty,
+} from "@/types/zodResponseSchemas";
 
 export const handleGetMyInfo = async (
   req: AuthenticatedRequest,
-  res: Response
+  reply: FastifyReply
 ) => {
   try {
     const user = await getUserById(req.user!.userId);
 
     if (!user) {
-      return res
+      return reply
         .status(404)
-        .json({ success: false, message: "User not found." });
+        .send(notFound.parse({ message: "User not found" }));
     }
 
-    return res.json({ success: true, data: user });
+    return reply.send(ok(userSchema).parse({ data: user }));
   } catch (error) {
-    logger.error(error, "Error fetching user.");
+    req.log.error(error, "Error fetching user");
 
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error." });
+    return reply.status(500).send(internalError.parse({}));
   }
 };
 
 export const handleSoftDelUser = async (
   req: AuthenticatedRequest,
-  res: Response
+  reply: FastifyReply
 ) => {
   try {
-    const result = await softDelUser(req.user!.userId);
+    const result = await softDeleteUser(req.user!.userId);
 
     if (!result) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found or already deleted.",
-      });
+      return reply
+        .status(404)
+        .send(notFound.parse({ message: "User not found or already deleted" }));
     }
 
-    return res.json({ success: true });
+    return reply.send(okEmpty.parse({}));
   } catch (error) {
-    logger.error(error, "Error soft deleting user.");
-
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error." });
+    req.log.error(error, "Error soft deleting user.");
+    return reply.status(500).send(internalError.parse({}));
   }
 };

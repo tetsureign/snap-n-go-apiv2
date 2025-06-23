@@ -1,95 +1,61 @@
-import { Request, Response } from "express";
-import z from "zod";
+import { FastifyReply, FastifyRequest } from "fastify";
+import { z } from "zod/v4";
 
-import { createUser } from "@/models/userModel";
+import { userSchema } from "@/models/User";
+import { loginWithGoogleToken, refreshToken } from "@/services/authService";
+import { tokenBodySchema } from "@/types/authSchemas";
 import {
-  googleTokenVerifier,
-  jwtTokenGenerator,
-  jwtTokenRefresher,
-} from "@/utils/authUtils";
+  badRequest,
+  tokenRefreshed,
+  userCreated,
+} from "@/types/zodResponseSchemas";
 
-import logger from "@/utils/logger";
+type TokenBody = z.infer<typeof tokenBodySchema>;
 
-const tokenReqBodySchema = z.object({
-  token: z.string().min(1, "Oauth2 token is required."),
-});
-
-const googleUserSchema = z.object({
-  sub: z.string().min(1, "Google ID is required."), // Probably never gonna throw but just in case
-  name: z.string().min(1, "Name is required."),
-  email: z.string().min(1, "Email is required.").email("Invalid email format."),
-});
-
-export const handleLoginByGoogleId = async (req: Request, res: Response) => {
-  const validation = tokenReqBodySchema.safeParse(req.body);
-  if (!validation.success)
-    return res
-      .status(400)
-      .json({ success: false, errors: validation.error.errors });
-
-  const googleUser = await googleTokenVerifier(validation.data.token);
-  if (!googleUser)
-    return res.status(401).json({ success: false, message: "Invalid token." });
-
-  const validatedGoogleUser = googleUserSchema.safeParse(googleUser);
-  if (!validatedGoogleUser.success)
-    return res
-      .status(400)
-      .json({ success: false, errors: validatedGoogleUser.error.errors });
-
+export const handleLoginByGoogleId = async (
+  req: FastifyRequest<{ Body: TokenBody }>,
+  reply: FastifyReply
+) => {
   try {
-    const newUser = await createUser({
-      googleId: validatedGoogleUser.data.sub,
-      email: validatedGoogleUser.data.email,
-      name: validatedGoogleUser.data.name,
-    });
+    const {
+      user,
+      accessToken,
+      refreshToken: refresh,
+    } = await loginWithGoogleToken(req.body.token);
 
-    const { accessToken, refreshToken } = jwtTokenGenerator({
-      userId: newUser.id,
-      googleId: newUser.google_id,
-    });
-
-    return res
-      .status(201)
-      .json({ success: true, data: newUser, accessToken, refreshToken });
-  } catch (error) {
-    logger.error(
-      {
-        error,
-        googleId: validatedGoogleUser.data.sub,
-        email: validatedGoogleUser.data.email,
-      },
-      "Error creating user."
+    return reply.status(201).send(
+      userCreated(userSchema).parse({
+        data: user,
+        accessToken,
+        refreshToken: refresh,
+      })
     );
+  } catch (error) {
+    req.log.error(error, "Error logging in with Google.");
 
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error." });
+    return reply
+      .status(401)
+      .send(badRequest.parse({ message: (error as Error).message }));
   }
 };
 
-export const handleRefreshToken = async (req: Request, res: Response) => {
-  const validation = tokenReqBodySchema.safeParse(req.body);
-  if (!validation.success) {
-    return res
-      .status(400)
-      .json({ success: false, errors: validation.error.errors });
-  }
-
+export const handleRefreshToken = async (
+  req: FastifyRequest<{ Body: TokenBody }>,
+  reply: FastifyReply
+) => {
   try {
-    const { accessToken, refreshToken } = await jwtTokenRefresher(
-      validation.data.token
+    const { accessToken, refreshToken: refresh } = await refreshToken(
+      req.body.token
     );
 
-    return res.status(200).json({ success: true, accessToken, refreshToken });
+    return reply
+      .status(200)
+      .send(tokenRefreshed.parse({ accessToken, refreshToken: refresh }));
   } catch (error) {
-    logger.error(error, "Error refreshing token.");
+    req.log.error(error, "Error refreshing token.");
 
-    if (error instanceof Error)
-      return res.status(401).json({ success: false, message: error.message });
-    else
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal server error." });
+    return reply
+      .status(401)
+      .send(badRequest.parse({ message: (error as Error).message }));
   }
 };

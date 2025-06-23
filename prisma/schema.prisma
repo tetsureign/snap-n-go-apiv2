@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model SearchHistory {
+  id          String    @id @default(uuid())
+  userId      String
+  searchQuery String
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model User {
+  id            String          @id @default(uuid())
+  googleId      String          @unique
+  email         String          @unique
+  name          String
+  createdAt     DateTime        @default(now())
+  deletedAt     DateTime?
+  searchHistory SearchHistory[]
+}

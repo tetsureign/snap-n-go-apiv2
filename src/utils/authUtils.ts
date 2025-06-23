@@ -1,10 +1,8 @@
 import { OAuth2Client } from "google-auth-library";
 import * as jwt from "jsonwebtoken";
 
-import { getUserByGoogleId } from "@/models/userModel";
+import { getUserByGoogleId } from "@/services/userService";
 import { TokenSchema } from "@/types";
-
-import logger from "@/utils/logger";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const REFRESH_SECRET = process.env.REFRESH_SECRET!;
@@ -22,7 +20,7 @@ export const googleTokenVerifier = async (idToken: string) => {
 
     return ticket.getPayload();
   } catch (error) {
-    logger.error(error, "Error verifying Google token.");
+    console.error(error, "Error verifying Google token.");
     return null;
   }
 };
@@ -45,7 +43,7 @@ export const jwtTokenRefresher = async (token: string) => {
 
     const { accessToken, refreshToken } = jwtTokenGenerator({
       userId: user.id,
-      googleId: user.google_id,
+      googleId: user.googleId,
     });
 
     return { accessToken, refreshToken };

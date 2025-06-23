@@ -1,46 +1,103 @@
-import express from "express";
-import cors from "cors";
-import rateLimit from "express-rate-limit";
-import helmet from "helmet";
 import "dotenv/config";
 
-import detectRouter from "@/routes/detectionRoute";
-import authRouter from "@/routes/authRoute";
-import userRouter from "@/routes/userRoute";
-import historyRouter from "@/routes/historyRoute";
+import fastify from "fastify";
+import {
+  jsonSchemaTransform,
+  serializerCompiler,
+  validatorCompiler,
+} from "fastify-type-provider-zod";
 
-import logger from "@/utils/logger";
 import errorHandler from "@/middlewares/errorHandler";
+import authRouter from "@/routes/authRoute";
+import detectRouter from "@/routes/detectionRoute";
+import historyRouter from "@/routes/historyRoute";
+import userRouter from "@/routes/userRoute";
+import cors from "@fastify/cors";
+import helmet from "@fastify/helmet";
+import multipart from "@fastify/multipart";
+import rateLimit from "@fastify/rate-limit";
+import swagger from "@fastify/swagger";
+import swaggerUI from "@fastify/swagger-ui";
 
 const RATE_LIMITER_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 const RATE_LIMITER_MAX = 100; // Limit each IP to 100 requests per windowMs
+const FILE_SIZE_LIMIT = 5 * 1024 * 1024; // 5MB
 
-const app = express();
-const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
-
-const limiter = rateLimit({
-  windowMs: RATE_LIMITER_WINDOW_MS,
-  max: RATE_LIMITER_MAX,
-  message: "Too many requests from this IP, please try again later.",
+const app = fastify({
+  logger: {
+    transport: {
+      target: "pino-pretty",
+      options: {
+        colorize: true,
+        ignore: "pid,hostname",
+      },
+    },
+    level: process.env.NODE_ENV === "production" ? "info" : "debug",
+  },
+  ajv: {
+    customOptions: {
+      removeAdditional: "all",
+      coerceTypes: true,
+      useDefaults: true,
+    },
+  },
 });
 
-app.use(helmet());
-app.use((req, res, next) => {
-  logger.info(`[${req.method}] ${req.url}`);
-  next();
-});
-app.use(errorHandler);
-app.use(cors());
-app.use(limiter);
-app.use(express.json());
+async function bootstrap() {
+  app.setValidatorCompiler(validatorCompiler);
+  app.setSerializerCompiler(serializerCompiler);
 
-const routePrefix = process.env.ROUTE_PREFIX;
+  // Register plugins
+  await app.register(rateLimit, {
+    max: RATE_LIMITER_MAX,
+    timeWindow: RATE_LIMITER_WINDOW_MS,
+    allowList: ["127.0.0.1"], // Allow localhost unlimited
+  });
 
-app.use(routePrefix + "/detect", detectRouter);
-app.use(routePrefix + "/auth", authRouter);
-app.use(routePrefix + "/user", userRouter);
-app.use(routePrefix + "/history", historyRouter);
+  await app.register(cors);
+  await app.register(helmet);
+  await app.register(multipart, {
+    limits: {
+      fileSize: FILE_SIZE_LIMIT,
+    },
+  });
 
-app.listen(port, "0.0.0.0", () => {
-  logger.info(`[server] Server started. http://localhost:${port}`);
-});
+  // Register Swagger
+  await app.register(swagger, {
+    openapi: {
+      info: {
+        title: "Snap & Go API",
+        description: "API documentation for Snap & Go",
+        version: "2.0.0",
+      },
+      servers: [],
+    },
+    transform: jsonSchemaTransform,
+  });
+  await app.register(swaggerUI, {
+    routePrefix: "/docs",
+  });
+
+  // Error handler
+  app.setErrorHandler(errorHandler);
+
+  const routePrefix = process.env.ROUTE_PREFIX || "";
+
+  // Register routes
+  await app.register(authRouter, { prefix: `${routePrefix}/auth` });
+  await app.register(detectRouter, { prefix: `${routePrefix}/detect` });
+  await app.register(userRouter, { prefix: `${routePrefix}/user` });
+  await app.register(historyRouter, { prefix: `${routePrefix}/history` });
+
+  const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+
+  try {
+    await app.listen({ port, host: "0.0.0.0" });
+    app.log.info(`Server started at http://localhost:${port}`);
+  } catch (err) {
+    app.log.error(err);
+    process.exit(1);
+  }
+}
+
+bootstrap();
