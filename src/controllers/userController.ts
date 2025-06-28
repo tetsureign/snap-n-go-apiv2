@@ -23,7 +23,7 @@ export const handleGetMyInfo = async (
         .send(notFound.parse({ message: "User not found" }));
     }
 
-    return reply.send(ok(userSchema).parse({ data: user }));
+    return reply.send(ok(userSchema).parse({ data: user.toDTO() }));
   } catch (error) {
     req.log.error(error, "Error fetching user");
 

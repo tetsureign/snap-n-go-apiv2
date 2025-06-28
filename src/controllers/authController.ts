@@ -25,7 +25,7 @@ export const handleLoginByGoogleId = async (
 
     return reply.status(201).send(
       userCreated(userSchema).parse({
-        data: user,
+        data: user.toDTO(),
         accessToken,
         refreshToken: refresh,
       })

@@ -33,6 +33,17 @@ export class User {
     Object.assign(this, data);
   }
 
+  toDTO(): UserDTO {
+    return {
+      id: this.id,
+      googleId: this.googleId,
+      email: this.email,
+      name: this.name,
+      createdAt: this.createdAt?.toISOString() ?? "",
+      deletedAt: this.deletedAt ? this.deletedAt.toISOString() : null,
+    };
+  }
+
   static async createOrUpdate(data: {
     googleId: string;
     email: string;
