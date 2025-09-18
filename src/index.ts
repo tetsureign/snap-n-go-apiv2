@@ -12,12 +12,15 @@ import authRouter from "@/routes/authRoute";
 import detectRouter from "@/routes/detectionRoute";
 import historyRouter from "@/routes/historyRoute";
 import userRouter from "@/routes/userRoute";
+
 import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import multipart from "@fastify/multipart";
 import rateLimit from "@fastify/rate-limit";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
+import { fastifyAwilixPlugin } from "@fastify/awilix";
+import container from "@/container/dependencyInjection";
 
 const RATE_LIMITER_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 const RATE_LIMITER_MAX = 100; // Limit each IP to 100 requests per windowMs
@@ -61,6 +64,15 @@ async function bootstrap() {
       fileSize: FILE_SIZE_LIMIT,
     },
   });
+
+  await app.register(fastifyAwilixPlugin, {
+    disposeOnClose: true,
+    disposeOnResponse: true,
+    strictBooleanEnforced: true,
+  });
+
+  // Register DI container
+  app.diContainer.register(container);
 
   // Register Swagger
   await app.register(swagger, {

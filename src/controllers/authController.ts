@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod/v4";
 
 import { userSchema } from "@/models/User";
-import { loginWithGoogleToken, refreshToken } from "@/services/authService";
+import { IAuthService } from "@/interfaces/services";
 import { tokenBodySchema } from "@/types/authSchemas";
 import {
   badRequest,
@@ -12,16 +12,32 @@ import {
 
 type TokenBody = z.infer<typeof tokenBodySchema>;
 
-export const handleLoginByGoogleId = async (
-  req: FastifyRequest<{ Body: TokenBody }>,
+export const handleOAuthLogin = async (
+  req: FastifyRequest<{ Body: TokenBody; Params: { provider: string } }>,
   reply: FastifyReply
 ) => {
   try {
+    const { provider } = req.params;
+
+    // Validate provider
+    if (!provider || !["google"].includes(provider.toLowerCase())) {
+      return reply.status(400).send(
+        badRequest.parse({
+          message: `Unsupported OAuth provider: ${provider}`,
+        })
+      );
+    }
+
+    // Resolve service based on provider
+    const authService = req.diScope.resolve<IAuthService>(
+      `${provider}AuthService`
+    );
+
     const {
       user,
       accessToken,
       refreshToken: refresh,
-    } = await loginWithGoogleToken(req.body.token);
+    } = await authService.loginWithToken(req.body.token);
 
     return reply.status(201).send(
       userCreated(userSchema).parse({
@@ -31,7 +47,7 @@ export const handleLoginByGoogleId = async (
       })
     );
   } catch (error) {
-    req.log.error(error, "Error logging in with Google.");
+    req.log.error(error, "Error logging in with OAuth provider.");
 
     return reply
       .status(401)
@@ -44,9 +60,10 @@ export const handleRefreshToken = async (
   reply: FastifyReply
 ) => {
   try {
-    const { accessToken, refreshToken: refresh } = await refreshToken(
-      req.body.token
-    );
+    const authService = req.diScope.resolve<IAuthService>("authService");
+
+    const { accessToken, refreshToken: refresh } =
+      await authService.refreshToken(req.body.token);
 
     return reply
       .status(200)
