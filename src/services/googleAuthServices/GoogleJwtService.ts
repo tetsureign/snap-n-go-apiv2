@@ -1,6 +1,7 @@
 import * as jwt from "jsonwebtoken";
 import { getUserByGoogleId } from "@/services/userService";
-import { IOAuthConfigService, IJwtService } from "@/interfaces/services";
+import { IJwtService } from "@/interfaces/IJwtService";
+import { IOAuthConfigService } from "@/interfaces/IOAuthConfigService";
 import { TokenSchema } from "@/types";
 
 export class GoogleJwtService implements IJwtService {
@@ -27,6 +28,10 @@ export class GoogleJwtService implements IJwtService {
 
       if (!user) {
         throw new Error("Invalid token.");
+      }
+
+      if (!user.googleId) {
+        throw new Error("No Google ID found.");
       }
 
       const { accessToken, refreshToken } = this.generateTokens({

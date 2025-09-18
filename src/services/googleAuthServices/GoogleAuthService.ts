@@ -1,9 +1,7 @@
 import { createOrUpdateUser } from "@/services/userService";
-import {
-  IOAuthService,
-  IJwtService,
-  IAuthService,
-} from "@/interfaces/services";
+import { IAuthService } from "@/interfaces/IAuthService";
+import { IJwtService } from "@/interfaces/IJwtService";
+import { IOAuthService } from "@/interfaces/IOAuthService";
 
 export class GoogleAuthService implements IAuthService {
   constructor(
@@ -16,10 +14,16 @@ export class GoogleAuthService implements IAuthService {
     if (!googleUser) throw new Error("Invalid Google token.");
 
     const { sub: googleId, email, name } = googleUser;
+
     if (!googleId || !email || !name)
       throw new Error("Missing Google user info.");
 
     const user = await createOrUpdateUser({ googleId, email, name });
+
+    if (!user.googleId) {
+      throw new Error("No Google ID found.");
+    }
+
     const { accessToken, refreshToken } = this.jwtService.generateTokens({
       userId: user.id,
       googleId: user.googleId,

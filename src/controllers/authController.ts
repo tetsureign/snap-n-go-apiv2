@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod/v4";
 
 import { userSchema } from "@/models/User";
-import { IAuthService } from "@/interfaces/services";
+import { IAuthService } from "@/interfaces/IAuthService";
 import { tokenBodySchema } from "@/types/authSchemas";
 import {
   badRequest,

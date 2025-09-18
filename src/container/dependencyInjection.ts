@@ -1,14 +1,12 @@
 import { asClass, asFunction, createContainer, InjectionMode } from "awilix";
-import { GoogleOAuthConfigService } from "@/services/GoogleOAuthConfigService";
-import { GoogleOAuthService } from "@/services/GoogleOAuthService";
-import { GoogleJwtService } from "@/services/GoogleJwtService";
-import { GoogleAuthService } from "@/services/GoogleAuthService";
-import {
-  IOAuthConfigService,
-  IOAuthService,
-  IJwtService,
-  IAuthService,
-} from "@/interfaces/services";
+import { GoogleOAuthConfigService } from "@/services/googleAuthServices/GoogleOAuthConfigService";
+import { GoogleOAuthService } from "@/services/googleAuthServices/GoogleOAuthService";
+import { GoogleJwtService } from "@/services/googleAuthServices/GoogleJwtService";
+import { GoogleAuthService } from "@/services/googleAuthServices/GoogleAuthService";
+import { IAuthService } from "@/interfaces/IAuthService";
+import { IJwtService } from "@/interfaces/IJwtService";
+import { IOAuthService } from "@/interfaces/IOAuthService";
+import { IOAuthConfigService } from "@/interfaces/IOAuthConfigService";
 
 export interface DIContainer {
   configService: IOAuthConfigService;
@@ -17,7 +15,7 @@ export interface DIContainer {
   googleAuthService: IAuthService;
   // Future providers can be added here
   // facebookAuthService: IAuthService;
-  // appleAuthService: IAuthService;
+  // discordAuthService: IAuthService;
 }
 
 export const container = createContainer<DIContainer>({
