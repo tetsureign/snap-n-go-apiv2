@@ -21,7 +21,10 @@ model SearchHistory {
 
 model User {
   id            String          @id @default(uuid())
-  googleId      String          @unique
+  googleId      String?         @unique
+  facebookId    String?         @unique
+  discordId     String?         @unique
+  githubId      String?         @unique
   email         String          @unique
   name          String
   createdAt     DateTime        @default(now())
