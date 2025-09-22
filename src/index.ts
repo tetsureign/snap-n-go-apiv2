@@ -72,7 +72,7 @@ async function bootstrap() {
   });
 
   // Register DI container
-  app.diContainer.register(container);
+  app.diContainer.register(container.registrations);
 
   // Register Swagger
   await app.register(swagger, {
