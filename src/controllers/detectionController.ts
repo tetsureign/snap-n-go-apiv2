@@ -3,8 +3,8 @@ import fs from "fs";
 
 import detectionService from "@/services/detectionService";
 
-import zodResponseSchemas from "@/types/zodResponseSchemas";
-import detectionSchemas from "@/types/detectionSchemas";
+import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
+import detectionSchemas from "@/schemas/detectionSchemas";
 
 import { pathChecking } from "@/utils/pathChecking";
 

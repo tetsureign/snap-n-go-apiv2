@@ -12,8 +12,8 @@ import {
   addMySearchQuerySchema,
   delMyQuerySchema,
   getMyHistoryLazySchema,
-} from "@/types/historyRequestSchemas";
-import { notFound, ok, okEmpty } from "@/types/zodResponseSchemas";
+} from "@/schemas/historyRequestSchemas";
+import { notFound, ok, okEmpty } from "@/schemas/response/zodResponseSchemas";
 
 const historyRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().post(

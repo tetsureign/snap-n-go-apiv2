@@ -2,8 +2,8 @@ import { FastifyPluginAsync } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 
 import { handleDetection } from "@/controllers/detectionController";
-import { detectionResult } from "@/types/detectionSchemas";
-import { badRequest, ok } from "@/types/zodResponseSchemas";
+import { detectionResult } from "@/schemas/detectionSchemas";
+import { badRequest, ok } from "@/schemas/response/zodResponseSchemas";
 
 const detectRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().post(

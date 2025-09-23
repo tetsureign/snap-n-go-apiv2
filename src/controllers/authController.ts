@@ -4,8 +4,8 @@ import { z } from "zod/v4";
 import { userSchema } from "@/models/User";
 import IAuthService from "@/interfaces/IAuthService";
 
-import authSchemas from "@/types/authSchemas";
-import zodResponseSchemas from "@/types/zodResponseSchemas";
+import authSchemas from "@/schemas/authSchemas";
+import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 
 type TokenBody = z.infer<typeof authSchemas.tokenBodySchema>;
 

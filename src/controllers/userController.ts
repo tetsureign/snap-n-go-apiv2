@@ -4,7 +4,7 @@ import { userSchema } from "@/models/User";
 import userService from "@/services/userService";
 
 import { AuthenticatedRequest } from "@/types";
-import zodResponseSchemas from "@/types/zodResponseSchemas";
+import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 
 export const handleGetMyInfo = async (
   req: AuthenticatedRequest,
@@ -37,13 +37,11 @@ export const handleSoftDelUser = async (
     const result = await userService.softDeleteUser(req.user!.userId);
 
     if (!result) {
-      return reply
-        .status(404)
-        .send(
-          zodResponseSchemas.notFound.parse({
-            message: "User not found or already deleted",
-          })
-        );
+      return reply.status(404).send(
+        zodResponseSchemas.notFound.parse({
+          message: "User not found or already deleted",
+        })
+      );
     }
 
     return reply.send(zodResponseSchemas.okEmpty.parse({}));

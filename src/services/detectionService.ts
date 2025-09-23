@@ -2,7 +2,7 @@ import FormData from "form-data";
 import fs from "fs";
 import { z } from "zod/v4";
 
-import detectionSchemas from "@/types/detectionSchemas";
+import detectionSchemas from "@/schemas/detectionSchemas";
 import { pathChecking } from "@/utils/pathChecking";
 import yoloApiClient from "@/utils/yoloApiClient";
 

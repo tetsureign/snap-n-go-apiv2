@@ -6,12 +6,12 @@ import {
   handleRefreshToken,
 } from "@/controllers/authController";
 import { userSchema } from "@/models/User";
-import { tokenBodySchema } from "@/types/authSchemas";
+import { tokenBodySchema } from "@/schemas/authSchemas";
 import {
   badRequest,
   tokenRefreshed,
   userCreated,
-} from "@/types/zodResponseSchemas";
+} from "@/schemas/response/zodResponseSchemas";
 
 const authRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().post(

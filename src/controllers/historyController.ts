@@ -5,8 +5,8 @@ import { historySchema } from "@/models/SearchHistory";
 import historyService from "@/services/historyService";
 
 import { AuthenticatedRequest } from "@/types";
-import historyRequestSchemas from "@/types/historyRequestSchemas";
-import zodResponseSchemas from "@/types/zodResponseSchemas";
+import historyRequestSchemas from "@/schemas/historyRequestSchemas";
+import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 
 type AddMyQueryBody = z.infer<
   typeof historyRequestSchemas.addMySearchQuerySchema
