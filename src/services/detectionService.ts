@@ -13,7 +13,7 @@ async function sendImageToYolo(imagePath: string) {
     const normalizedPath = pathChecking(imagePath);
 
     const formData = new FormData();
-    const imageBuffer = fs.readFileSync(normalizedPath);
+    const imageBuffer = await fs.promises.readFile(normalizedPath);
     formData.append("file", imageBuffer, {
       filename: "image",
       contentType: "image/*",
