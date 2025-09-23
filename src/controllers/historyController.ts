@@ -2,11 +2,7 @@ import { FastifyReply } from "fastify";
 import { z } from "zod/v4";
 
 import { historySchema } from "@/models/SearchHistory";
-import {
-  addSearchQueryHistory,
-  getUserQueryHistoryLazy,
-  softDelQueryHistory,
-} from "@/services/historyService";
+import historyService from "@/services/historyService";
 import { AuthenticatedRequest } from "@/types";
 import {
   addMySearchQuerySchema,
@@ -29,7 +25,7 @@ export const handleAddMyQueryHistory = async (
   reply: FastifyReply
 ) => {
   try {
-    const newHistoryEntry = await addSearchQueryHistory({
+    const newHistoryEntry = await historyService.addSearchQueryHistory({
       userId: req.user!.userId, // user is ensured through the auth middleware
       query: req.body.query,
     });
@@ -50,7 +46,7 @@ export const handleGetMyHistoryLazy = async (
   try {
     const { limit, cursor } = req.query;
 
-    const entries = await getUserQueryHistoryLazy(
+    const entries = await historyService.getUserQueryHistoryLazy(
       req.user!.userId,
       limit,
       cursor
@@ -68,7 +64,10 @@ export const handleDeleteMyQueryHistory = async (
   reply: FastifyReply
 ) => {
   try {
-    const result = await softDelQueryHistory(req.user!.userId, req.body.ids);
+    const result = await historyService.softDelQueryHistory(
+      req.user!.userId,
+      req.body.ids
+    );
 
     if (!result)
       return reply.status(404).send(

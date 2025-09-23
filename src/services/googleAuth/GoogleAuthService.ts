@@ -1,7 +1,7 @@
-import { createOrUpdateUser } from "@/services/userService";
-import { IAuthService } from "@/interfaces/IAuthService";
-import { IJwtService } from "@/interfaces/IJwtService";
-import { IOAuthService } from "@/interfaces/IOAuthService";
+import userService from "@/services/userService";
+import IAuthService from "@/interfaces/IAuthService";
+import IJwtService from "@/interfaces/IJwtService";
+import IOAuthService from "@/interfaces/IOAuthService";
 
 export class GoogleAuthService implements IAuthService {
   constructor(
@@ -18,7 +18,11 @@ export class GoogleAuthService implements IAuthService {
     if (!googleId || !email || !name)
       throw new Error("Missing Google user info.");
 
-    const user = await createOrUpdateUser({ googleId, email, name });
+    const user = await userService.createOrUpdateUser({
+      googleId,
+      email,
+      name,
+    });
 
     if (!user.googleId) {
       throw new Error("No Google ID found.");

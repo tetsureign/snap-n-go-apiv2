@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import fs from "fs";
 
-import { sendImageToYolo } from "@/services/detectionService";
+import detectionService from "@/services/detectionService";
 import { badRequest, internalError, ok } from "@/types/zodResponseSchemas";
 import { pathChecking } from "@/utils/pathChecking";
 import { detectionResult as detectionResultSchema } from "@/types/detectionSchemas";
@@ -29,7 +29,9 @@ export const handleDetection = async (
 
   try {
     const normalizedPath = pathChecking(tempPath);
-    const detectionResult = await sendImageToYolo(normalizedPath);
+    const detectionResult = await detectionService.sendImageToYolo(
+      normalizedPath
+    );
 
     reply.send(ok(detectionResultSchema).parse({ data: detectionResult }));
 

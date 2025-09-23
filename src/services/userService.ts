@@ -1,24 +1,24 @@
 import { User } from "@/models/User";
 
-export async function getUserById(userId: string) {
+async function getUserById(userId: string) {
   return User.getById(userId);
 }
 
-export async function getUserByGoogleId(googleId: string) {
+async function getUserByGoogleId(googleId: string) {
   return User.getByGoogleId(googleId);
 }
 
-export async function createOrUpdateUser({
+async function createOrUpdateUser({
   googleId,
   facebookId,
-  appleId,
+  discordId,
   githubId,
   email,
   name,
 }: {
   googleId?: string;
   facebookId?: string;
-  appleId?: string;
+  discordId?: string;
   githubId?: string;
   email: string;
   name: string;
@@ -26,15 +26,24 @@ export async function createOrUpdateUser({
   return User.createOrUpdate({
     googleId,
     facebookId,
-    appleId,
+    discordId,
     githubId,
     email,
     name,
   });
 }
 
-export async function softDeleteUser(userId: string) {
+async function softDeleteUser(userId: string) {
   const user = await User.getById(userId);
   if (!user) return false;
   return user.softDelete(userId);
 }
+
+const userService = {
+  getUserById,
+  getUserByGoogleId,
+  createOrUpdateUser,
+  softDeleteUser,
+};
+
+export default userService;

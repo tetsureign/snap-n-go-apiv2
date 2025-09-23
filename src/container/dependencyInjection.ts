@@ -3,10 +3,10 @@ import { GoogleOAuthConfigService } from "@/services/googleAuth/GoogleOAuthConfi
 import { GoogleOAuthService } from "@/services/googleAuth/GoogleOAuthService";
 import { GoogleJwtService } from "@/services/googleAuth/GoogleJwtService";
 import { GoogleAuthService } from "@/services/googleAuth/GoogleAuthService";
-import { IAuthService } from "@/interfaces/IAuthService";
-import { IJwtService } from "@/interfaces/IJwtService";
-import { IOAuthService } from "@/interfaces/IOAuthService";
-import { IOAuthConfigService } from "@/interfaces/IOAuthConfigService";
+import IAuthService from "@/interfaces/IAuthService";
+import IJwtService from "@/interfaces/IJwtService";
+import IOAuthService from "@/interfaces/IOAuthService";
+import IOAuthConfigService from "@/interfaces/IOAuthConfigService";
 
 export interface DIContainer {
   configService: IOAuthConfigService;

@@ -1,6 +1,6 @@
 import { SearchHistory } from "@/models/SearchHistory";
 
-export async function addSearchQueryHistory({
+async function addSearchQueryHistory({
   userId,
   query,
 }: {
@@ -10,7 +10,7 @@ export async function addSearchQueryHistory({
   return SearchHistory.add({ userId, searchQuery: query });
 }
 
-export async function getUserQueryHistoryLazy(
+async function getUserQueryHistoryLazy(
   userId: string,
   limit: number,
   cursor?: string
@@ -18,6 +18,14 @@ export async function getUserQueryHistoryLazy(
   return SearchHistory.getUserHistory(userId, limit, cursor);
 }
 
-export async function softDelQueryHistory(userId: string, ids: string[]) {
+async function softDelQueryHistory(userId: string, ids: string[]) {
   return SearchHistory.softDeleteUserScoped(userId, ids);
 }
+
+const historyService = {
+  addSearchQueryHistory,
+  getUserQueryHistoryLazy,
+  softDelQueryHistory,
+};
+
+export default historyService;

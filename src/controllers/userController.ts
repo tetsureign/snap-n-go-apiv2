@@ -1,7 +1,7 @@
 import { FastifyReply } from "fastify";
 
 import { userSchema } from "@/models/User";
-import { getUserById, softDeleteUser } from "@/services/userService";
+import userService from "@/services/userService";
 import { AuthenticatedRequest } from "@/types";
 import {
   internalError,
@@ -15,7 +15,7 @@ export const handleGetMyInfo = async (
   reply: FastifyReply
 ) => {
   try {
-    const user = await getUserById(req.user!.userId);
+    const user = await userService.getUserById(req.user!.userId);
 
     if (!user) {
       return reply
@@ -36,7 +36,7 @@ export const handleSoftDelUser = async (
   reply: FastifyReply
 ) => {
   try {
-    const result = await softDeleteUser(req.user!.userId);
+    const result = await userService.softDeleteUser(req.user!.userId);
 
     if (!result) {
       return reply

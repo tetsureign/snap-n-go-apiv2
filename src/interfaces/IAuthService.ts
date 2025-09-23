@@ -1,4 +1,4 @@
-export interface IAuthService {
+export default interface IAuthService {
   loginWithToken(token: string): Promise<{
     user: any;
     accessToken: string;

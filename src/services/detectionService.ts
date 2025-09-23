@@ -8,7 +8,7 @@ import yoloApiClient from "@/utils/yoloApiClient";
 
 type DetectionResult = z.infer<typeof detectionResult>;
 
-export const sendImageToYolo = async (imagePath: string) => {
+async function sendImageToYolo(imagePath: string) {
   try {
     const normalizedPath = pathChecking(imagePath);
 
@@ -31,4 +31,10 @@ export const sendImageToYolo = async (imagePath: string) => {
   } catch (error) {
     throw new Error("Error sending image to microservice: " + error);
   }
+}
+
+const detectionService = {
+  sendImageToYolo,
 };
+
+export default detectionService;

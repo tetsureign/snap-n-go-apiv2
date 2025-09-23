@@ -1,4 +1,4 @@
-import { IOAuthConfigService } from "@/interfaces/IOAuthConfigService";
+import IOAuthConfigService from "@/interfaces/IOAuthConfigService";
 
 export class GoogleOAuthConfigService implements IOAuthConfigService {
   public readonly jwtSecret: string;
