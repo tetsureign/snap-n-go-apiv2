@@ -1,4 +1,4 @@
-import { SearchHistory } from "@/models/SearchHistory";
+import SearchHistory from "@/models/SearchHistory";
 
 async function addSearchQueryHistory({
   userId,

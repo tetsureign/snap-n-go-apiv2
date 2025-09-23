@@ -2,11 +2,11 @@ import FormData from "form-data";
 import fs from "fs";
 import { z } from "zod/v4";
 
-import { detectionResult } from "@/types/detectionSchemas";
+import detectionSchemas from "@/types/detectionSchemas";
 import { pathChecking } from "@/utils/pathChecking";
 import yoloApiClient from "@/utils/yoloApiClient";
 
-type DetectionResult = z.infer<typeof detectionResult>;
+type DetectionResult = z.infer<typeof detectionSchemas.detectionResult>;
 
 async function sendImageToYolo(imagePath: string) {
   try {

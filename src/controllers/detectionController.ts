@@ -3,9 +3,10 @@ import fs from "fs";
 
 import detectionService from "@/services/detectionService";
 
-import { badRequest, internalError, ok } from "@/types/zodResponseSchemas";
+import zodResponseSchemas from "@/types/zodResponseSchemas";
+import detectionSchemas from "@/types/detectionSchemas";
+
 import { pathChecking } from "@/utils/pathChecking";
-import { detectionResult as detectionResultSchema } from "@/types/detectionSchemas";
 
 export const handleDetection = async (
   req: FastifyRequest,
@@ -16,7 +17,9 @@ export const handleDetection = async (
   if (!data) {
     return reply
       .status(400)
-      .send(badRequest.parse({ message: "No file uploaded" }));
+      .send(
+        zodResponseSchemas.badRequest.parse({ message: "No file uploaded" })
+      );
   }
 
   // Save file to disk
@@ -34,7 +37,11 @@ export const handleDetection = async (
       normalizedPath
     );
 
-    reply.send(ok(detectionResultSchema).parse({ data: detectionResult }));
+    reply.send(
+      zodResponseSchemas
+        .ok(detectionSchemas.detectionResult)
+        .parse({ data: detectionResult })
+    );
 
     fs.unlink(normalizedPath, (err) => {
       err && req.log.error(err, "Failed to delete file.");
@@ -49,6 +56,6 @@ export const handleDetection = async (
     } catch (deleteError) {
       req.log.error(deleteError, "Failed to validate path for deletion.");
     }
-    reply.status(500).send(internalError.parse({}));
+    reply.status(500).send(zodResponseSchemas.internalError.parse({}));
   }
 };

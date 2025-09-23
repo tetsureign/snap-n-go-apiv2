@@ -5,21 +5,18 @@ import { historySchema } from "@/models/SearchHistory";
 import historyService from "@/services/historyService";
 
 import { AuthenticatedRequest } from "@/types";
-import {
-  addMySearchQuerySchema,
-  delMyQuerySchema,
-  getMyHistoryLazySchema,
-} from "@/types/historyRequestSchemas";
-import {
-  internalError,
-  notFound,
-  ok,
-  okEmpty,
-} from "@/types/zodResponseSchemas";
+import historyRequestSchemas from "@/types/historyRequestSchemas";
+import zodResponseSchemas from "@/types/zodResponseSchemas";
 
-type AddMyQueryBody = z.infer<typeof addMySearchQuerySchema>;
-type GetMyHistoryQuery = z.infer<typeof getMyHistoryLazySchema>;
-type DeleteMyHistoryBody = z.infer<typeof delMyQuerySchema>;
+type AddMyQueryBody = z.infer<
+  typeof historyRequestSchemas.addMySearchQuerySchema
+>;
+type GetMyHistoryQuery = z.infer<
+  typeof historyRequestSchemas.getMyHistoryLazySchema
+>;
+type DeleteMyHistoryBody = z.infer<
+  typeof historyRequestSchemas.delMyQuerySchema
+>;
 
 export const handleAddMyQueryHistory = async (
   req: AuthenticatedRequest<{ Body: AddMyQueryBody }>,
@@ -33,10 +30,12 @@ export const handleAddMyQueryHistory = async (
 
     return reply
       .status(201)
-      .send(ok(historySchema).parse({ data: newHistoryEntry }));
+      .send(
+        zodResponseSchemas.ok(historySchema).parse({ data: newHistoryEntry })
+      );
   } catch (error) {
     req.log.error(error, "Error adding search history.");
-    return reply.status(500).send(internalError.parse({}));
+    return reply.status(500).send(zodResponseSchemas.internalError.parse({}));
   }
 };
 
@@ -53,10 +52,12 @@ export const handleGetMyHistoryLazy = async (
       cursor
     );
 
-    return reply.send(ok(historySchema).parse({ data: entries }));
+    return reply.send(
+      zodResponseSchemas.ok(historySchema).parse({ data: entries })
+    );
   } catch (error) {
     req.log.error({ error, req }, "Error fetching user's search history.");
-    return reply.status(500).send(internalError.parse({}));
+    return reply.status(500).send(zodResponseSchemas.internalError.parse({}));
   }
 };
 
@@ -72,14 +73,14 @@ export const handleDeleteMyQueryHistory = async (
 
     if (!result)
       return reply.status(404).send(
-        notFound.parse({
+        zodResponseSchemas.notFound.parse({
           message: "History entries not found or already deleted.",
         })
       );
 
-    return reply.send(okEmpty.parse({}));
+    return reply.send(zodResponseSchemas.okEmpty.parse({}));
   } catch (error) {
     req.log.error(error, "Error soft deleting history.");
-    return reply.status(500).send(internalError.parse({}));
+    return reply.status(500).send(zodResponseSchemas.internalError.parse({}));
   }
 };

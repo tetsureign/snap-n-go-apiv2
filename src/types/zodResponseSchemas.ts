@@ -48,3 +48,17 @@ export const tokenRefreshed = z.object({
   accessToken: z.string(),
   refreshToken: z.string(),
 });
+
+const zodResponseSchemas = {
+  ok,
+  okEmpty,
+  notFound,
+  internalError,
+  unauthorized,
+  forbidden,
+  badRequest,
+  userCreated,
+  tokenRefreshed,
+};
+
+export default zodResponseSchemas;

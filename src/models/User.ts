@@ -17,7 +17,7 @@ export const userSchema = z.object({
 
 export type UserDTO = z.infer<typeof userSchema>;
 
-export class User {
+export default class User {
   id!: string;
   googleId?: string | null;
   facebookId?: string | null;
