@@ -1,10 +1,13 @@
 /// <reference types="vitest" />
 import { defineConfig } from "vitest/config";
-import path from "path";
+import tsconfigPaths from "vite-tsconfig-paths";
+// import path from "path";
 
 export default defineConfig({
+  plugins: [tsconfigPaths()],
   test: {
-    // environment: "node",
+    globals: true,
+    environment: "node",
     // include: ["src/**/*.{test,spec}.{js,ts}"],
     // exclude: [
     //   "generated",
@@ -19,10 +22,10 @@ export default defineConfig({
     //   reporter: ["text", "json", "html"],
     // },
   },
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-      prisma: path.resolve(__dirname, "./prisma"),
-    },
-  },
+  // resolve: {
+  //   alias: {
+  //     "@": path.resolve(__dirname, "./src"),
+  //     "prisma/*": path.resolve(__dirname, "./prisma/*"),
+  //   },
+  // },
 });
