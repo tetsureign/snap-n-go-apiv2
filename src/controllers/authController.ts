@@ -2,10 +2,11 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod/v4";
 
 import { userSchema } from "@/models/User";
-import IAuthService from "@/interfaces/IAuthService";
 
 import authSchemas from "@/schemas/authSchemas";
 import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
+import IJwtService from "@/interfaces/IJwtService";
+import IOAuthService from "@/interfaces/IOAuthService";
 
 type TokenBody = z.infer<typeof authSchemas.tokenBodySchema>;
 
@@ -26,15 +27,15 @@ export const handleOAuthLogin = async (
     }
 
     // Resolve service based on provider
-    const authService = req.diScope.resolve<IAuthService>(
-      `${provider}AuthService`
+    const oAuthService = req.diScope.resolve<IOAuthService>(
+      `${provider}OAuthService`
     );
 
     const {
       user,
       accessToken,
       refreshToken: refresh,
-    } = await authService.loginWithToken(req.body.token);
+    } = await oAuthService.loginWithToken(req.body.token);
 
     return reply.status(201).send(
       zodResponseSchemas.userCreated(userSchema).parse({
@@ -59,10 +60,10 @@ export const handleRefreshToken = async (
   reply: FastifyReply
 ) => {
   try {
-    const authService = req.diScope.resolve<IAuthService>("authService");
+    const jwtService = req.diScope.resolve<IJwtService>("jwtService");
 
     const { accessToken, refreshToken: refresh } =
-      await authService.refreshToken(req.body.token);
+      await jwtService.refreshToken(req.body.token);
 
     return reply.status(200).send(
       zodResponseSchemas.tokenRefreshed.parse({
