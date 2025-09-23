@@ -1,8 +1,10 @@
-import { asClass, asFunction, createContainer, InjectionMode } from "awilix";
-import { GoogleOAuthConfigService } from "@/services/googleAuth/GoogleOAuthConfigService";
-import { GoogleOAuthService } from "@/services/googleAuth/GoogleOAuthService";
-import { GoogleJwtService } from "@/services/googleAuth/GoogleJwtService";
-import { GoogleAuthService } from "@/services/googleAuth/GoogleAuthService";
+import { asClass, createContainer, InjectionMode } from "awilix";
+
+import GoogleOAuthConfigService from "@/services/googleAuth/GoogleOAuthConfigService";
+import GoogleOAuthService from "@/services/googleAuth/GoogleOAuthService";
+import GoogleJwtService from "@/services/googleAuth/GoogleJwtService";
+import GoogleAuthService from "@/services/googleAuth/GoogleAuthService";
+
 import IAuthService from "@/interfaces/IAuthService";
 import IJwtService from "@/interfaces/IJwtService";
 import IOAuthService from "@/interfaces/IOAuthService";

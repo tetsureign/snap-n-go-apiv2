@@ -2,6 +2,7 @@ import { FastifyReply } from "fastify";
 
 import { userSchema } from "@/models/User";
 import userService from "@/services/userService";
+
 import { AuthenticatedRequest } from "@/types";
 import {
   internalError,

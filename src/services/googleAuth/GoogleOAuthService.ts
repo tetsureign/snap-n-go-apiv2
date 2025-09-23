@@ -3,7 +3,7 @@ import { OAuth2Client } from "google-auth-library";
 import IOAuthService from "@/interfaces/IOAuthService";
 import IOAuthConfigService from "@/interfaces/IOAuthConfigService";
 
-export class GoogleOAuthService implements IOAuthService {
+export default class GoogleOAuthService implements IOAuthService {
   private oauth2Client: OAuth2Client;
 
   constructor(private configService: IOAuthConfigService) {

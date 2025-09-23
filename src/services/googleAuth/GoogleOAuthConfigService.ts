@@ -1,6 +1,6 @@
 import IOAuthConfigService from "@/interfaces/IOAuthConfigService";
 
-export class GoogleOAuthConfigService implements IOAuthConfigService {
+export default class GoogleOAuthConfigService implements IOAuthConfigService {
   public readonly jwtSecret: string;
   public readonly refreshSecret: string;
   public readonly clientId: string;

@@ -4,7 +4,7 @@ import IJwtService from "@/interfaces/IJwtService";
 import IOAuthConfigService from "@/interfaces/IOAuthConfigService";
 import { TokenSchema } from "@/types";
 
-export class GoogleJwtService implements IJwtService {
+export default class GoogleJwtService implements IJwtService {
   constructor(private configService: IOAuthConfigService) {}
 
   generateTokens(payload: TokenSchema) {

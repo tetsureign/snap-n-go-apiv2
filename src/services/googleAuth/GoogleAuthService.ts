@@ -3,7 +3,7 @@ import IAuthService from "@/interfaces/IAuthService";
 import IJwtService from "@/interfaces/IJwtService";
 import IOAuthService from "@/interfaces/IOAuthService";
 
-export class GoogleAuthService implements IAuthService {
+export default class GoogleAuthService implements IAuthService {
   constructor(
     private oauthService: IOAuthService,
     private jwtService: IJwtService

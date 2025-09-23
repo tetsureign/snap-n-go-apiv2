@@ -2,6 +2,7 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import fs from "fs";
 
 import detectionService from "@/services/detectionService";
+
 import { badRequest, internalError, ok } from "@/types/zodResponseSchemas";
 import { pathChecking } from "@/utils/pathChecking";
 import { detectionResult as detectionResultSchema } from "@/types/detectionSchemas";

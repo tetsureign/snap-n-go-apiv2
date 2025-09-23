@@ -3,6 +3,7 @@ import { z } from "zod/v4";
 
 import { historySchema } from "@/models/SearchHistory";
 import historyService from "@/services/historyService";
+
 import { AuthenticatedRequest } from "@/types";
 import {
   addMySearchQuerySchema,
