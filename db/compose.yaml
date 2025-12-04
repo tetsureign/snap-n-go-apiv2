@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: snapandgo_db
+    env_file: .env
+    environment:
+      MYSQL_DATABASE: snapandgo
+      MYSQL_USER: snapandgo_user
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_snapandgo_data:/var/lib/mysql
+
+volumes:
+  mysql_snapandgo_data:
