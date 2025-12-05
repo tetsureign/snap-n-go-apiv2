@@ -6,7 +6,7 @@ import {
   handleRefreshToken,
 } from "@/controllers/authController";
 import { userSchema } from "@/models/User";
-import tokenBodySchema from "@/schemas/authSchemas";
+import authSchemas from "@/schemas/authSchemas";
 import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 
 const authRouter: FastifyPluginAsync = async (fastify) => {
@@ -16,14 +16,7 @@ const authRouter: FastifyPluginAsync = async (fastify) => {
       schema: {
         description: "Login with OAuth2 token (supports multiple providers)",
         tags: ["Auth"],
-        params: {
-          type: "object",
-          properties: {
-            provider: { type: "string", enum: ["google"] },
-          },
-          required: ["provider"],
-        },
-        body: tokenBodySchema,
+        body: authSchemas.tokenBodySchema,
         response: {
           201: zodResponseSchemas.userCreated(userSchema),
           400: zodResponseSchemas.badRequest,
@@ -40,7 +33,7 @@ const authRouter: FastifyPluginAsync = async (fastify) => {
       schema: {
         description: "Refresh JWT access token",
         tags: ["Auth"],
-        body: tokenBodySchema,
+        body: authSchemas.tokenBodySchema,
         response: {
           200: zodResponseSchemas.tokenRefreshed,
           401: zodResponseSchemas.badRequest,

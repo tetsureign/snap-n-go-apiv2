@@ -32,6 +32,8 @@ const corsOriginsEnv = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN;
 
 let corsOrigins: string[] | RegExp[];
 
+const routePrefix = process.env.ROUTE_PREFIX || "";
+
 if (corsOriginsEnv) {
   // Parse comma-separated origins from environment variable
   corsOrigins = corsOriginsEnv.split(",").map((origin) => origin.trim());
@@ -110,14 +112,13 @@ async function bootstrap() {
     },
     transform: jsonSchemaTransform,
   });
+
   await app.register(swaggerUI, {
-    routePrefix: "/docs",
+    routePrefix: `${routePrefix}/docs`,
   });
 
   // Error handler
   app.setErrorHandler(errorHandler);
-
-  const routePrefix = process.env.ROUTE_PREFIX || "";
 
   // Register routes
   await app.register(authRouter, { prefix: `${routePrefix}/auth` });
