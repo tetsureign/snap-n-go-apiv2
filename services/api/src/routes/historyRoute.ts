@@ -8,12 +8,8 @@ import {
 } from "@/controllers/historyController";
 import { authenticator } from "@/middlewares/authenticator";
 import { historySchema } from "@/models/SearchHistory";
-import {
-  addMySearchQuerySchema,
-  delMyQuerySchema,
-  getMyHistoryLazySchema,
-} from "@/schemas/historyRequestSchemas";
-import { notFound, ok, okEmpty } from "@/schemas/response/zodResponseSchemas";
+import historyRequestSchemas from "@/schemas/historyRequestSchemas";
+import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 
 const historyRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().post(
@@ -21,9 +17,9 @@ const historyRouter: FastifyPluginAsync = async (fastify) => {
     {
       preHandler: authenticator,
       schema: {
-        body: addMySearchQuerySchema,
+        body: historyRequestSchemas.addMySearchQuerySchema,
         response: {
-          201: ok(historySchema),
+          201: zodResponseSchemas.ok(historySchema),
         },
         tags: ["History"],
         description: "Add a search query to history",
@@ -37,9 +33,9 @@ const historyRouter: FastifyPluginAsync = async (fastify) => {
     {
       preHandler: authenticator,
       schema: {
-        querystring: getMyHistoryLazySchema,
+        querystring: historyRequestSchemas.getMyHistoryLazySchema,
         response: {
-          200: ok(historySchema),
+          200: zodResponseSchemas.ok(historySchema),
         },
         tags: ["History"],
         description: "Get user's search history (paginated)",
@@ -53,10 +49,10 @@ const historyRouter: FastifyPluginAsync = async (fastify) => {
     {
       preHandler: authenticator,
       schema: {
-        body: delMyQuerySchema,
+        body: historyRequestSchemas.delMyQuerySchema,
         response: {
-          200: okEmpty,
-          404: notFound,
+          200: zodResponseSchemas.okEmpty,
+          404: zodResponseSchemas.notFound,
         },
         tags: ["History"],
         description: "Soft delete search history entries",

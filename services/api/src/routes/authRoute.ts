@@ -7,11 +7,7 @@ import {
 } from "@/controllers/authController";
 import { userSchema } from "@/models/User";
 import tokenBodySchema from "@/schemas/authSchemas";
-import {
-  badRequest,
-  tokenRefreshed,
-  userCreated,
-} from "@/schemas/response/zodResponseSchemas";
+import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 
 const authRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().post(
@@ -29,9 +25,9 @@ const authRouter: FastifyPluginAsync = async (fastify) => {
         },
         body: tokenBodySchema,
         response: {
-          201: userCreated(userSchema),
-          400: badRequest,
-          401: badRequest,
+          201: zodResponseSchemas.userCreated(userSchema),
+          400: zodResponseSchemas.badRequest,
+          401: zodResponseSchemas.badRequest,
         },
       },
     },
@@ -46,8 +42,8 @@ const authRouter: FastifyPluginAsync = async (fastify) => {
         tags: ["Auth"],
         body: tokenBodySchema,
         response: {
-          200: tokenRefreshed,
-          401: badRequest,
+          200: zodResponseSchemas.tokenRefreshed,
+          401: zodResponseSchemas.badRequest,
         },
       },
     },

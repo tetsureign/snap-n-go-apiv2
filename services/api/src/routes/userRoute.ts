@@ -7,7 +7,7 @@ import {
 } from "@/controllers/userController";
 import { authenticator } from "@/middlewares/authenticator";
 import { userSchema } from "@/models/User";
-import { notFound, ok, okEmpty } from "@/schemas/response/zodResponseSchemas";
+import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 
 const userRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().get(
@@ -18,8 +18,8 @@ const userRouter: FastifyPluginAsync = async (fastify) => {
         description: "Get current user info",
         tags: ["User"],
         response: {
-          200: ok(userSchema),
-          404: notFound,
+          200: zodResponseSchemas.ok(userSchema),
+          404: zodResponseSchemas.notFound,
         },
       },
     },
@@ -33,8 +33,8 @@ const userRouter: FastifyPluginAsync = async (fastify) => {
         description: "Soft delete current user",
         tags: ["User"],
         response: {
-          200: okEmpty,
-          404: notFound,
+          200: zodResponseSchemas.okEmpty,
+          404: zodResponseSchemas.notFound,
         },
       },
     },
