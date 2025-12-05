@@ -26,6 +26,25 @@ const RATE_LIMITER_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 const RATE_LIMITER_MAX = 100; // Limit each IP to 100 requests per windowMs
 const FILE_SIZE_LIMIT = 5 * 1024 * 1024; // 5MB
 
+// CORS configuration
+const isProduction = process.env.NODE_ENV === "production";
+const corsOriginsEnv = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN;
+
+let corsOrigins: string[] | RegExp[];
+
+if (corsOriginsEnv) {
+  // Parse comma-separated origins from environment variable
+  corsOrigins = corsOriginsEnv.split(",").map((origin) => origin.trim());
+} else if (isProduction) {
+  // In production, require explicit CORS configuration
+  throw new Error(
+    "CORS_ORIGINS or CORS_ORIGIN environment variable is required in production"
+  );
+} else {
+  // In development, default to allowing localhost on any port
+  corsOrigins = [/^http:\/\/localhost:\d+$/, /^http:\/\/127\.0\.0\.1:\d+$/];
+}
+
 const app = fastify({
   logger: {
     transport: {
@@ -57,7 +76,12 @@ async function bootstrap() {
     allowList: ["127.0.0.1"], // Allow localhost unlimited
   });
 
-  await app.register(cors);
+  await app.register(cors, {
+    origin: corsOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    credentials: true,
+  });
   await app.register(helmet);
   await app.register(multipart, {
     limits: {
@@ -72,7 +96,7 @@ async function bootstrap() {
   });
 
   // Register DI container
-  app.diContainer.register(container);
+  app.diContainer.register(container.registrations);
 
   // Register Swagger
   await app.register(swagger, {

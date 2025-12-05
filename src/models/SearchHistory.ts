@@ -12,7 +12,7 @@ export const historySchema = z.object({
 
 export type historyDTO = z.infer<typeof historySchema>;
 
-export class SearchHistory {
+export default class SearchHistory {
   id!: string;
   userId!: string;
   searchQuery!: string;

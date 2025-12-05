@@ -1,10 +1,10 @@
 import * as jwt from "jsonwebtoken";
-import { getUserByGoogleId } from "@/services/userService";
-import { IJwtService } from "@/interfaces/IJwtService";
-import { IOAuthConfigService } from "@/interfaces/IOAuthConfigService";
+import userService from "@/services/userService";
+import IJwtService from "@/interfaces/IJwtService";
+import IOAuthConfigService from "@/interfaces/IOAuthConfigService";
 import { TokenSchema } from "@/types";
 
-export class GoogleJwtService implements IJwtService {
+export default class GoogleJwtService implements IJwtService {
   constructor(private configService: IOAuthConfigService) {}
 
   generateTokens(payload: TokenSchema) {
@@ -24,7 +24,7 @@ export class GoogleJwtService implements IJwtService {
         token,
         this.configService.refreshSecret
       ) as TokenSchema;
-      const user = await getUserByGoogleId(decoded.googleId);
+      const user = await userService.getUserByGoogleId(decoded.googleId);
 
       if (!user) {
         throw new Error("Invalid token.");

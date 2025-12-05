@@ -7,7 +7,7 @@ import {
 } from "@/controllers/userController";
 import { authenticator } from "@/middlewares/authenticator";
 import { userSchema } from "@/models/User";
-import { notFound, ok, okEmpty } from "@/types/zodResponseSchemas";
+import { notFound, ok, okEmpty } from "@/schemas/response/zodResponseSchemas";
 
 const userRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().get(

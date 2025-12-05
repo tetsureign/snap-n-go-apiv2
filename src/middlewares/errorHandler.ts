@@ -1,4 +1,4 @@
-import { internalError } from "@/types/zodResponseSchemas";
+import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 import { FastifyError, FastifyReply, FastifyRequest } from "fastify";
 
 export default function errorHandler(
@@ -9,5 +9,5 @@ export default function errorHandler(
   request.log.error(
     `Error on ${request.method} ${request.url}: ${error.message}`
   );
-  reply.status(500).send(internalError.parse({}));
+  reply.status(500).send(zodResponseSchemas.internalError.parse({}));
 }

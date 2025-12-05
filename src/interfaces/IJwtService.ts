@@ -1,6 +1,6 @@
 import { TokenSchema } from "@/types";
 
-export interface IJwtService {
+export default interface IJwtService {
   generateTokens(payload: TokenSchema): {
     accessToken: string;
     refreshToken: string;
