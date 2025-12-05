@@ -1,5 +1,5 @@
 import prisma from "prisma/client";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 import { restore, softDelete } from "@/libs/softDelete";
 

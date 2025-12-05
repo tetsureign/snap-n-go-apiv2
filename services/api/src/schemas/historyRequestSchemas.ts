@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const addMySearchQuerySchema = z.object({
   query: z.string().min(1, "Search query is required."),

@@ -1,6 +1,6 @@
 import { restore } from "@/libs/softDelete";
 import prisma from "prisma/client";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 export const historySchema = z.object({
   id: z.string(),

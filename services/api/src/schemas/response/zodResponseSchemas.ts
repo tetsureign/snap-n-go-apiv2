@@ -1,4 +1,4 @@
-import { z } from "zod/v4";
+import { z } from "zod";
 
 const ok = <T>(objectSchema: T) =>
   z.object({

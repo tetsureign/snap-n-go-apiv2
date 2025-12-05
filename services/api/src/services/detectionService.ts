@@ -1,6 +1,6 @@
 import FormData from "form-data";
 import fs from "fs";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 import detectionSchemas from "@/schemas/detectionSchemas";
 import { pathChecking } from "@/utils/pathChecking";

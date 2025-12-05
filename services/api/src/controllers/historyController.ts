@@ -1,5 +1,5 @@
 import { FastifyReply } from "fastify";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 import { historySchema } from "@/models/SearchHistory";
 import historyService from "@/services/historyService";

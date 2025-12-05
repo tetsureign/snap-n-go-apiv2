@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { z } from "zod/v4";
+import { z } from "zod";
 
 import { userSchema } from "@/models/User";
 
