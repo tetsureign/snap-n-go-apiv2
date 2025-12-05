@@ -1,0 +1,9 @@
+.git
+.vscode
+.idea
+
+# Docker-related files
+compose.yaml
+
+# Node-specific
+node_modules

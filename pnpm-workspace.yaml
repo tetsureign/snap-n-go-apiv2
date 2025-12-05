@@ -1,3 +1,6 @@
+packages:
+  - 'services/*'
+
 onlyBuiltDependencies:
   - '@prisma/client'
   - '@prisma/engines'

@@ -6,7 +6,7 @@ import {
   handleRefreshToken,
 } from "@/controllers/authController";
 import { userSchema } from "@/models/User";
-import { tokenBodySchema } from "@/schemas/authSchemas";
+import tokenBodySchema from "@/schemas/authSchemas";
 import {
   badRequest,
   tokenRefreshed,

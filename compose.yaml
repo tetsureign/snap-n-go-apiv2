@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  # Node.js/Fastify Backend
+  api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      # Services can talk to each other using their names.
+      - DATABASE_URL=postgresql://user:password@db:5432/mydatabase
+      - NODE_ENV=development
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  # Your Python/FastAPI ML Microservice
+  ml-service:
+    build:
+      # The context is now the 'ml-service' directory
+      context: ./services/ml-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+
+  # Database Service
+  db:
+    image: mysql:8.0
+    container_name: snapandgo_db
+    env_file: .env
+    environment:
+      MYSQL_DATABASE: snapandgo
+      MYSQL_USER: snapandgo_user
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_snapandgo_data:/var/lib/mysql
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_snapandgo_data:

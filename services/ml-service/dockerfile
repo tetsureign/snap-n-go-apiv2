@@ -1,0 +1,22 @@
+FROM python:3.9.21-slim-bookworm
+
+WORKDIR /yolov5-snap-go
+
+COPY ./requirements.txt .
+
+# OpenCV dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install  --no-cache-dir torch torchvision --extra-index-url https://download.pytorch.org/whl/cpu
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY ./ .
+
+CMD [ "python", "main.py" ]
+
+EXPOSE 8000
