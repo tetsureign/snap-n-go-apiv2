@@ -3,6 +3,7 @@ version: "3.8"
 services:
   # Node.js/Fastify Backend
   api:
+    container_name: snapandgo_api
     build:
       context: .
       dockerfile: dockerfile
@@ -21,6 +22,7 @@ services:
 
   # Python/FastAPI ML Microservice
   ml-service:
+    container_name: snapandgo_ml_service
     build:
       context: ./services/ml-service
       dockerfile: dockerfile

@@ -7,12 +7,12 @@ FROM base AS build
 COPY . /usr/src/app
 WORKDIR /usr/src/app
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm --filter api run prisma:generate
 RUN pnpm run -r build
 RUN pnpm deploy --filter=api --prod /prod/api
 
 FROM base AS api
 COPY --from=build /prod/api /prod/api
 WORKDIR /prod/api
-ENV NODE_ENV=production
 EXPOSE 3000
-CMD [ "pnpm", "start" ]
+CMD [ "pnpm", "start:prod" ]
