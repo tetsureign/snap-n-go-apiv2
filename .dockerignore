@@ -1,9 +1,14 @@
 .git
+.gitignore
 .vscode
 .idea
+*.md
 
 # Docker-related files
 compose.yaml
+compose.override.yaml
 
 # Node-specific
 node_modules
+dist
+

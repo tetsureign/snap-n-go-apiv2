@@ -1,4 +1,4 @@
-FROM python:3.9.21-slim-bookworm
+FROM python:3.14.1-slim-bookworm
 
 WORKDIR /yolov5-snap-go
 

@@ -4,27 +4,27 @@ services:
   # Node.js/Fastify Backend
   api:
     build:
-      context: ./services/api
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: dockerfile
     ports:
       - "3000:3000"
-    environment:
-      # Services can talk to each other using their names.
-      - DATABASE_URL=postgresql://user:password@db:5432/mydatabase
-      - NODE_ENV=development
+    env_file:
+      - ./services/api/.env
     depends_on:
       - db
+      - ml-service
+    restart: unless-stopped
     networks:
       - app-network
 
-  # Your Python/FastAPI ML Microservice
+  # Python/FastAPI ML Microservice
   ml-service:
     build:
-      # The context is now the 'ml-service' directory
       context: ./services/ml-service
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     ports:
       - "8000:8000"
+    restart: unless-stopped
     networks:
       - app-network
 
@@ -38,6 +38,7 @@ services:
       MYSQL_USER: snapandgo_user
     ports:
       - "3306:3306"
+    restart: unless-stopped
     volumes:
       - mysql_snapandgo_data:/var/lib/mysql
 
