@@ -1,4 +1,7 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+
+// .env is located at the root of the project
+dotenv.config({ path: "../../.env" });
 
 import fastify from "fastify";
 import {
