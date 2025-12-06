@@ -1,5 +1,3 @@
-
-
 FROM node:lts-trixie-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -15,5 +13,6 @@ RUN pnpm deploy --filter=api --prod /prod/api
 FROM base AS api
 COPY --from=build /prod/api /prod/api
 WORKDIR /prod/api
+ENV NODE_ENV=production
 EXPOSE 3000
 CMD [ "pnpm", "start" ]
