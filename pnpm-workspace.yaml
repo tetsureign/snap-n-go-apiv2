@@ -1,6 +1,11 @@
 packages:
   - 'services/*'
 
+syncInjectedDepsAfterScripts:
+- build
+
+injectWorkspacePackages: true
+
 onlyBuiltDependencies:
   - '@prisma/client'
   - '@prisma/engines'
