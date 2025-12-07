@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  # Disable the api service in this override, as we'll run it locally
+  api:
+    profiles:
+      - donotstart
+
+  # Add the development-only volume mount for live code reloading
+  ml-service:
+    volumes:
+      - ./services/ml-service:/yolov5-snap-go
+    restart: "no"
+
+  # The db service inherits its configuration from the base compose.yaml
+  # so we don't need to add anything for it here.
+  db:
+    restart: "no"
+
+networks:
+  app-network: {}

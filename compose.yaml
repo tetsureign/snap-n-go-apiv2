@@ -1,0 +1,51 @@
+version: "3.8"
+
+services:
+  # Node.js/Fastify Backend
+  api:
+    container_name: snapandgo_api
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - ml-service
+    restart: unless-stopped
+    networks:
+      - app-network
+    tmpfs:
+      - /tmp
+
+  # Python/FastAPI ML Microservice
+  ml-service:
+    container_name: snapandgo_ml_service
+    build:
+      context: ./services/ml-service
+      dockerfile: dockerfile
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Database Service
+  db:
+    image: mysql:8.0
+    container_name: snapandgo_db
+    env_file: .env
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+    volumes:
+      - mysql_snapandgo_data:/var/lib/mysql
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_snapandgo_data:

@@ -1,0 +1,20 @@
+.git
+.gitignore
+.vscode
+.idea
+*.md
+
+# Docker-related files
+compose.yaml
+compose.override.yaml
+
+# Node-specific
+node_modules
+dist
+generated
+__tests__
+__mocks__
+vitest.config.mts
+
+# Exclude Python microservice files. It will be built on a separate Dockerfile
+services/ml-service

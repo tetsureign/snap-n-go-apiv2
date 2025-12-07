@@ -1,8 +1,106 @@
 # Snap & Go API
 
-This is the backend of the [Snap & Go mobile app](https://github.com/tetsureign/SnapAndGo). It handles authentication, object detection forwarding, user management, and search history persistence.
+This is the backend for the [Snap & Go mobile app](https://github.com/tetsureign/SnapAndGo). It handles authentication, object detection forwarding, user management, and search history persistence. Built with a modern, opinionated stack including TypeScript, Fastify, Prisma, and Docker.
 
-Built with TypeScript and Fastify. It started from a scratch "npm init" and evolved into a small but opinionated backend project to practice and apply my learned architectural patterns where it make sense.
+---
+
+## Features
+
+- OAuth authentication with Google (multi-provider support ready with DI)
+- Object detection API that forwards images to a YOLOv5 microservice
+- User management endpoints (get user info, soft delete)
+- Search history CRUD operations with pagination
+- JWT token management (access and refresh tokens)
+- API documentation via Swagger/OpenAPI at `/docs`
+- Containerized for consistent development and production environments
+- Security best practices: Rate limiting, Helmet, CORS, secure file handling
+
+## Tech Stack
+
+- **Containerization**: Docker, Docker Compose
+- **Runtime**: Node.js
+- **Framework**: Fastify
+- **Language**: TypeScript
+- **Database**: Prisma ORM with MySQL
+- **Validation**: Zod
+- **Testing**: Vitest
+- **Tooling**: pnpm, ESLint, TypeScript
+
+---
+
+## Getting Started
+
+This project is designed to be run with Docker and Docker Compose, which handles the database and machine learning microservice.
+
+### Prerequisites
+
+- Docker and Docker Compose (or Podman and Podman Compose)
+- Node.js (for development)
+- pnpm
+
+### 1. Environment Configuration
+
+First, set up your environment variables. The project uses a single `.env` file in the root directory.
+
+```bash
+# Start by copying the example file
+cp .env.example .env
+```
+
+Now, open the `.env` file and fill in the required values, especially your `GOOGLE_CLIENT_ID` and secrets. The default values for database and service URLs are already configured for the Docker setup.
+
+---
+
+## Development
+
+This project is configured for a hybrid development environment where background services (database, ML service) run in Docker, and the API service runs directly on your host machine for faster development and hot-reloading.
+
+1.  **Start Background Services:**
+    The `compose.override.yaml` file is configured to automatically start only the database and ML service for development. Open a terminal and run:
+
+    ```bash
+    docker compose up -d
+    ```
+
+    This command will start the MySQL database and the Python ML service in detached mode.
+
+2.  **Configure Environment for Localhost:**
+    Since the API will run on your host, it needs to connect to the Docker services via `localhost`. Modify your `.env` file to point to the correct local ports:
+
+    ```diff
+    - DATABASE_URL="mysql://snapandgo:snapandgo@db:3306/snapandgo_db"
+    + DATABASE_URL="mysql://snapandgo:snapandgo@localhost:3306/snapandgo_db"
+    - YOLO_SERVICE_URL=http://ml-service:8000
+    + YOLO_SERVICE_URL=http://localhost:8000
+    ```
+
+3.  **Install Dependencies & Run API:**
+    In a separate terminal, install the pnpm dependencies and start the API server in development (watch) mode:
+    ```bash
+    pnpm install
+    pnpm --filter api dev
+    ```
+    The API will now be running at `http://localhost:3000` and will automatically restart when you make changes to the source code.
+
+---
+
+## Production
+
+To run the application in a production environment, all services will be run via Docker.
+
+1.  **Set Production Environment:**
+    Ensure your `.env` file is configured for production (e.g., using production secrets, setting `NODE_ENV=production`, and using the Docker service names like `db` and `ml-service` for URLs, not `localhost`).
+
+2.  **Run with Docker Compose:**
+    Execute the following command to build and start all services defined in the primary `compose.yaml` file.
+
+    ```bash
+    docker compose -f compose.yaml up -d
+    ```
+
+    This command intentionally ignores the `compose.override.yaml` file, which is only for development.
+
+---
 
 ## Project History and Decisions
 
@@ -35,32 +133,6 @@ Below is how I brought my knowledge from ASP.NET Core over to this project
 - I introduced Dependency Injection with `awilix` for OAuth only. OAuth is where it makes the most sense - it allows for easily swapping OAuth providers and implementations without having to change everything that handles auth. It also allows for easier mocking of those services when testing. Introducing DI everywhere would break its lean and functional flow, which is what I want to maintain. And since other services and Prisma are easily mockable, the need for DI on those services lessens dramatically
 - For tests, I'm working on adding some unit tests to core services, and integration tests to core flows. This is mostly for studying, and I believe that writing integration tests is more valuable than writing unit tests for every single part possible. Things might work independently, but breaks when wired with other things, which, is the real-world, where the app is used. Also, I've chosen Vitest over Jest, as it is more modern, supports TypeScript out-of-the-box, and is still API-compatible with Jest so there's not a lot of learning curve
 
-## Features
-
-- OAuth authentication with Google (multi-provider support ready with DI)
-- Object detection API that forwards images to YOLOv5 microservice
-- User management endpoints (get user info, soft delete)
-- Search history CRUD operations with pagination
-- JWT token management (access and refresh tokens)
-- Swagger/OpenAPI documentation at `/docs`
-- Rate limiting and security middleware
-
-## Tech Stack
-
-- **Runtime**: Node.js
-- **Framework**: Fastify
-- **Language**: TypeScript
-- **Database**: Prisma ORM with MySQL
-- **Validation**: Zod
-- **Dependency Injection**: Awilix
-- **Security**: JWT (jsonwebtoken), Helmet, CORS, Rate limiting
-- **Documentation**: Swagger/OpenAPI (@fastify/swagger, @fastify/swagger-ui)
-- **Testing**: Vitest
-- **HTTP Client**: Axios (for YOLO service communication)
-- **Image Processing**: Sharp
-- **OAuth**: google-auth-library
-- **Tooling**: ESLint, TypeScript
-
 ## Architecture
 
 The backend follows a microservices architecture:
@@ -88,76 +160,13 @@ Mobile App → Fastify Backend → YOLOv5 FastAPI Microservice
 - **Mobile App**: [Snap & Go React Native App](https://github.com/tetsureign/SnapAndGo)
 - **ML Service**: [YOLOv5 FastAPI Microservice](https://github.com/tetsureign/SnapAndGo-microsvc-objdetect)
 
-## Requirements
-
-- Node.js
-- pnpm (package manager, enforced in preinstall)
-- MySQL database
-- YOLOv5 FastAPI microservice (for object detection)
-
-## Getting Started
-
-1. **Install dependencies**:
-
-   ```bash
-   pnpm install
-   ```
-
-2. **Configure environment variables**:
-   Copy `.env.example` to `.env` and use your own values.
-
-3. **Set up the database**:
-   Run Prisma migrations to set up the database schema:
-
-   ```bash
-   # Generate Prisma client
-   pnpm run prisma:generate
-
-   # Run migrations (if Prisma migrate is set up)
-   # npx prisma migrate dev
-   ```
-
-4. **Start the YOLOv5 microservice**:
-   Ensure your YOLOv5 FastAPI microservice is running and accessible.
-
-5. **Run the server**:
-
-   ```bash
-   # Development mode (watch mode)
-   pnpm run dev
-
-   # Or production mode
-   pnpm run build
-   pnpm start
-   ```
-
-## Environment Variables
-
-- `JWT_SECRET` - Secret for signing/verifying JWT access tokens
-- `REFRESH_SECRET` - Secret for signing/verifying JWT refresh tokens
-- `GOOGLE_CLIENT_ID` - Google OAuth client ID for authentication
-- `YOLO_SERVICE_URL` - Base URL for the external YOLOv5 detection microservice
-- `DATABASE_URL` - Prisma database connection string (MySQL)
-- `PORT` - Port for the HTTP server (default: 3000)
-- `ROUTE_PREFIX` - Optional API prefix for routes
-- `UPLOAD_TEMP_DIR` - Directory for temporary file uploads (default: `/tmp`)
-- `CORS_ORIGINS` or `CORS_ORIGIN` - Comma-separated allowed origins (required in production)
-- `NODE_ENV` - Environment mode: `production` or `development` (affects CORS, logging)
-
-See `.env.example` for a starting point.
-
 ## Available Scripts
 
-- `pnpm dev` - Start development server (watch mode)
-- `pnpm build` - Build TypeScript to JavaScript
-- `pnpm start` - Start production server
-- `pnpm test` - Run Vitest test suite
-- `pnpm test:coverage` - Run tests with coverage report
-- `pnpm test:unit` - Run unit tests only
-- `pnpm test:integration` - Run integration tests only
-- `pnpm test:e2e` - Run end-to-end tests only
-- `pnpm lint` - Run ESLint
-- `pnpm prisma:generate` - Generate Prisma client
+- `pnpm --filter api dev` - Start the API in development watch mode.
+- `pnpm --filter api build` - Build the API for production.
+- `pnpm --filter api start` - Start the built API.
+- `pnpm test` - Run the full test suite for the API.
+- `pnpm lint` - Run ESLint on the monorepo.
 
 ## Development Notes
 
