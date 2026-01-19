@@ -1,23 +1,23 @@
-FROM python:3.11-slim-bookworm
-
-WORKDIR /yolov5-snap-go
-
+FROM python:3.11-slim-bookworm AS builder
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+WORKDIR /deps-install
 COPY ./requirements.txt .
+RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
+RUN pip install --no-cache-dir -r requirements.txt
+# Remove the standard opencv-python installed by ultralytics to avoid libGL errors
+# And re-install headless to ensure cv2 is present
+RUN pip uninstall -y opencv-python
+RUN pip install --no-cache-dir opencv-python-headless
 
+FROM python:3.11-slim-bookworm AS yolov5-snap-go
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+WORKDIR /yolov5-snap-go
 # Install libglib2.0-0 for libgthread (required by OpenCV/Torch internals)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
-
-RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
-
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Remove the standard opencv-python installed by ultralytics to avoid libGL errors
-RUN pip uninstall -y opencv-python
-
 COPY ./ .
-
 CMD [ "python", "main.py" ]
-
 EXPOSE 8000

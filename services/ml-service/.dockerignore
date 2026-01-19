@@ -11,3 +11,4 @@ htmlcov/
 *.txt
 !requirements.txt
 create.py
+*.pt
