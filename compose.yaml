@@ -9,11 +9,15 @@ services:
       dockerfile: dockerfile
     ports:
       - "3000:3000"
+    environment:
+      - NODE_ENV=production
     env_file:
       - .env
     depends_on:
-      - db
-      - ml-service
+      db:
+        condition: service_healthy
+      ml-service:
+        condition: service_started
     restart: unless-stopped
     networks:
       - app-network
@@ -39,9 +43,16 @@ services:
     env_file: .env
     ports:
       - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     volumes:
       - mysql_snapandgo_data:/var/lib/mysql
+    networks:
+      - app-network
 
 networks:
   app-network:

@@ -1,4 +1,4 @@
-FROM node:lts-trixie-slim AS base
+FROM node:lts-alpine3.23 AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
@@ -14,5 +14,6 @@ RUN pnpm deploy --filter=api --prod /prod/api
 FROM base AS api
 COPY --from=build /prod/api /prod/api
 WORKDIR /prod/api
+RUN rm -rf ./src __tests__ pnpm-lock.yaml tsconfig.json vitest.config.mts
 EXPOSE 3000
-CMD [ "pnpm", "start:prod" ]
+CMD [ "sh", "-c", "pnpm run prisma:deploy && pnpm start:prod" ]
