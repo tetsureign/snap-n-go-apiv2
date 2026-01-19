@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Remove the standard opencv-python installed by ultralytics to avoid libGL errors
 # And re-install headless to ensure cv2 is present
 RUN pip uninstall -y opencv-python
-RUN pip install --no-cache-dir opencv-python-headless
+RUN pip install --no-cache-dir "opencv-python-headless<=4.12.0.88"
 
 FROM python:3.11-slim-bookworm AS yolov5-snap-go
 COPY --from=builder /opt/venv /opt/venv
