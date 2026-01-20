@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "es2023",
     "lib": ["ESNext", "ES6"],
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
+    "module": "esnext",
+    "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
@@ -13,7 +13,6 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-
     "strict": true,
     "skipLibCheck": true
   }
