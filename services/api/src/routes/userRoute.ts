@@ -23,7 +23,7 @@ const userRouter: FastifyPluginAsync = async (fastify) => {
         },
       },
     },
-    handleGetMyInfo
+    handleGetMyInfo,
   );
   fastify.withTypeProvider<ZodTypeProvider>().delete(
     "/me/delete",
@@ -38,7 +38,7 @@ const userRouter: FastifyPluginAsync = async (fastify) => {
         },
       },
     },
-    handleSoftDelUser
+    handleSoftDelUser,
   );
 };
 
