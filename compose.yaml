@@ -18,11 +18,27 @@ services:
         condition: service_healthy
       ml-service:
         condition: service_started
+      migrator:
+        condition: service_completed_successfully
     restart: unless-stopped
     networks:
       - app-network
     tmpfs:
       - /tmp
+
+  # Init Container for Migrations
+  migrator:
+    build:
+      context: .
+      dockerfile: dockerfile
+      target: build
+    command: pnpm --filter api run prisma:deploy
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
 
   # Python/FastAPI ML Microservice
   ml-service:

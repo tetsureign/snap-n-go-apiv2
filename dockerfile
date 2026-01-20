@@ -14,6 +14,6 @@ RUN pnpm deploy --filter=api --prod /prod/api
 FROM base AS api
 COPY --from=build /prod/api /prod/api
 WORKDIR /prod/api
-RUN rm -rf ./src __tests__ pnpm-lock.yaml tsconfig.json vitest.config.mts
+RUN rm -rf ./src pnpm-lock.yaml tsconfig.json
 EXPOSE 3000
-CMD [ "sh", "-c", "pnpm run prisma:deploy && pnpm start:prod" ]
+CMD [ "pnpm", "start:prod" ]
