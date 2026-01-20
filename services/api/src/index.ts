@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 
 // .env is located at the root of the project
-dotenv.config({ path: "../../.env" });
+dotenv.config({ path: "../../../.env" });
 
 import fastify from "fastify";
 import {
@@ -43,7 +43,7 @@ if (corsOriginsEnv) {
 } else if (isProduction) {
   // In production, require explicit CORS configuration
   throw new Error(
-    "CORS_ORIGINS or CORS_ORIGIN environment variable is required in production"
+    "CORS_ORIGINS or CORS_ORIGIN environment variable is required in production",
   );
 } else {
   // In development, default to allowing localhost on any port
