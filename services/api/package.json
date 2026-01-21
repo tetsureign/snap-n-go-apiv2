@@ -8,7 +8,7 @@
     "preinstall": "npx only-allow pnpm",
     "build": "tsup src/index.ts --format esm --clean",
     "start": "node dist/index.js",
-    "start:prod": "NODE_ENV=production node dist/src/index.js",
+    "start:prod": "NODE_ENV=production node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "lint": "eslint . --ext .ts",
     "test": "vitest",
@@ -67,5 +67,8 @@
     "sharp": "^0.33.5",
     "uuid": "^11.1.0",
     "zod": "^4.1.13"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }

@@ -12,7 +12,7 @@ services:
     environment:
       - NODE_ENV=production
     env_file:
-      - .env
+      - services/api/.env
     depends_on:
       db:
         condition: service_healthy
@@ -33,7 +33,7 @@ services:
       dockerfile: dockerfile
       target: build
     command: pnpm --filter api run prisma:deploy
-    env_file: .env
+    env_file: services/api/.env
     depends_on:
       db:
         condition: service_healthy
@@ -56,7 +56,7 @@ services:
   db:
     image: mysql:8.0
     container_name: snapandgo_db
-    env_file: .env
+    env_file: services/api/.env
     ports:
       - "3306:3306"
     healthcheck:
