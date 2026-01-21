@@ -9,7 +9,7 @@ services:
   # Add the development-only volume mount for live code reloading
   ml-service:
     volumes:
-      - ./services/ml-service:/yolov5-snap-go
+      - ./ml-service:/yolov5-snap-go
     restart: "no"
 
   # The db service inherits its configuration from the base compose.yaml
