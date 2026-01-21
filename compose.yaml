@@ -5,14 +5,14 @@ services:
   api:
     container_name: snapandgo_api
     build:
-      context: .
+      context: ./api
       dockerfile: dockerfile
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
     env_file:
-      - services/api/.env
+      - api/.env
     depends_on:
       db:
         condition: service_healthy
@@ -29,11 +29,11 @@ services:
   # Init Container for Migrations
   migrator:
     build:
-      context: .
+      context: ./api
       dockerfile: dockerfile
       target: build
-    command: pnpm --filter api run prisma:deploy
-    env_file: services/api/.env
+    command: pnpm run prisma:deploy
+    env_file: api/.env
     depends_on:
       db:
         condition: service_healthy
@@ -44,7 +44,7 @@ services:
   ml-service:
     container_name: snapandgo_ml_service
     build:
-      context: ./services/ml-service
+      context: ./ml-service
       dockerfile: dockerfile
     ports:
       - "8000:8000"
@@ -56,7 +56,7 @@ services:
   db:
     image: mysql:8.0
     container_name: snapandgo_db
-    env_file: services/api/.env
+    env_file: api/.env
     ports:
       - "3306:3306"
     healthcheck:

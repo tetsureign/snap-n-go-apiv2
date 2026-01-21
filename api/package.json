@@ -16,8 +16,8 @@
     "test:unit": "vitest __tests__/unit",
     "test:integration": "vitest __tests__/integration",
     "test:e2e": "vitest __tests__/e2e",
-    "prisma:generate": "pnpx prisma@^7.2.0 generate",
-    "prisma:deploy": "pnpx prisma@^7.2.0 migrate deploy"
+    "prisma:generate": "prisma generate",
+    "prisma:deploy": "prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +31,7 @@
     "@vitest/coverage-v8": "^4.0.15",
     "eslint": "^9.39.1",
     "globals": "^15.15.0",
+    "prisma": "^7.2.0",
     "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.16",
