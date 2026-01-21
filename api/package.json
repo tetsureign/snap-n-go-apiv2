@@ -1,5 +1,5 @@
 {
-  "name": "api",
+  "name": "snap-n-go-api",
   "version": "2.0.0",
   "private": true,
   "main": "dist/index.js",
