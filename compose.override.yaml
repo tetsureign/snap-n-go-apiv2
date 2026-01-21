@@ -6,6 +6,11 @@ services:
     profiles:
       - donotstart
 
+  # Disable the db migrator that's only meant for prod
+  migrator:
+    profiles:
+      - donotstart
+
   # Add the development-only volume mount for live code reloading
   ml-service:
     volumes:
