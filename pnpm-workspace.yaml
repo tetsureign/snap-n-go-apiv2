@@ -4,9 +4,7 @@ packages:
 injectWorkspacePackages: true
 
 onlyBuiltDependencies:
-  - '@prisma/engines'
   - esbuild
-  - prisma
   - sharp
 
 overrides:
