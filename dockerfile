@@ -7,8 +7,8 @@ FROM base AS build
 COPY . /usr/src/app
 WORKDIR /usr/src/app
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-# Using a dummy env
-RUN DATABASE_URL="mysql://build:3306/build" pnpm --filter api run prisma:generate
+# Using a dummy env to run Prisma Generate
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store DATABASE_URL="mysql://build:3306/build" pnpm --filter api run prisma:generate
 RUN pnpm run -r build
 RUN pnpm deploy --filter=api --prod /prod/api
 
