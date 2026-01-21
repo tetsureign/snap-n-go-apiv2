@@ -40,14 +40,14 @@ This project is designed to be run with Docker and Docker Compose, which handles
 
 ### 1. Environment Configuration
 
-First, set up your environment variables. The project uses a single `.env` file in the root directory.
+First, set up your environment variables for the API service.
 
 ```bash
-# Start by copying the example file
-cp .env.example .env
+# Start by copying the example file in the api directory
+cp api/.env.example api/.env
 ```
 
-Now, open the `.env` file and fill in the required values, especially your `GOOGLE_CLIENT_ID` and secrets. The default values for database and service URLs are already configured for the Docker setup.
+Now, open the `api/.env` file and fill in the required values, especially your `GOOGLE_CLIENT_ID` and secrets. The default values for database and service URLs are already configured for the Docker setup.
 
 ---
 
@@ -65,20 +65,21 @@ This project is configured for a hybrid development environment where background
     This command will start the MySQL database and the Python ML service in detached mode.
 
 2.  **Configure Environment for Localhost:**
-    Since the API will run on your host, it needs to connect to the Docker services via `localhost`. Modify your `.env` file to point to the correct local ports:
+    Since the API will run on your host, it needs to connect to the Docker services via `localhost`. Modify your `api/.env` file to point to the correct local ports:
 
     ```diff
-    - DATABASE_URL="mysql://snapandgo:snapandgo@db:3306/snapandgo_db"
-    + DATABASE_URL="mysql://snapandgo:snapandgo@localhost:3306/snapandgo_db"
     - YOLO_SERVICE_URL=http://ml-service:8000
     + YOLO_SERVICE_URL=http://localhost:8000
+    - DB_HOST=db
+    + DB_HOST=localhost
     ```
 
 3.  **Install Dependencies & Run API:**
-    In a separate terminal, install the pnpm dependencies and start the API server in development (watch) mode:
+    In a separate terminal, navigate to the `api` directory, install the dependencies, and start the API server in development (watch) mode:
     ```bash
+    cd api
     pnpm install
-    pnpm --filter api dev
+    pnpm dev
     ```
     The API will now be running at `http://localhost:3000` and will automatically restart when you make changes to the source code.
 
@@ -89,7 +90,7 @@ This project is configured for a hybrid development environment where background
 To run the application in a production environment, all services will be run via Docker.
 
 1.  **Set Production Environment:**
-    Ensure your `.env` file is configured for production (e.g., using production secrets, setting `NODE_ENV=production`, and using the Docker service names like `db` and `ml-service` for URLs, not `localhost`).
+    Ensure your `api/.env` file is configured for production (e.g., using production secrets, setting `NODE_ENV=production`, and using the Docker service names like `db` and `ml-service` for URLs).
 
 2.  **Run with Docker Compose:**
     Execute the following command to build and start all services defined in the primary `compose.yaml` file.
@@ -162,11 +163,13 @@ Mobile App → Fastify Backend → YOLOv5 FastAPI Microservice
 
 ## Available Scripts
 
-- `pnpm --filter api dev` - Start the API in development watch mode.
-- `pnpm --filter api build` - Build the API for production.
-- `pnpm --filter api start` - Start the built API.
+All commands should be run from the `api` directory.
+
+- `pnpm dev` - Start the API in development watch mode.
+- `pnpm build` - Build the API for production.
+- `pnpm start` - Start the built API.
 - `pnpm test` - Run the full test suite for the API.
-- `pnpm lint` - Run ESLint on the monorepo.
+- `pnpm lint` - Run ESLint on the `api` package.
 
 ## Development Notes
 
