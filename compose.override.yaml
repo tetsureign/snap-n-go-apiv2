@@ -11,16 +11,16 @@ services:
     profiles:
       - donotstart
 
-  # Add the development-only volume mount for live code reloading
+  # Add the development-only volume mount for live code reloading on ml-service
   ml-service:
     volumes:
       - ./ml-service:/yolov5-snap-go
     restart: "no"
 
-  # The db service inherits its configuration from the base compose.yaml
-  # so we don't need to add anything for it here.
+  # Don't start the prod db service
   db:
-    restart: "no"
+    profiles:
+      - donotstart
 
   # Separate DB service for development
   db-dev:
