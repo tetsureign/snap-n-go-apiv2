@@ -22,5 +22,26 @@ services:
   db:
     restart: "no"
 
+  # Separate DB service for development
+  db-dev:
+    image: mysql:8.0
+    container_name: snapandgo_db_dev
+    env_file: api/.env.dev
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: "no"
+    volumes:
+      - mysql_snapandgo_dev_data:/var/lib/mysql
+    networks:
+      - app-network
+
 networks:
   app-network: {}
+
+volumes:
+  mysql_snapandgo_dev_data:
