@@ -1,30 +1,48 @@
-version: "3.8"
-
 services:
   # Node.js/Fastify Backend
   api:
     container_name: snapandgo_api
     build:
-      context: .
+      context: ./api
       dockerfile: dockerfile
     ports:
       - "3000:3000"
+    environment:
+      - NODE_ENV=production
     env_file:
-      - .env
+      - api/.env
     depends_on:
-      - db
-      - ml-service
+      db:
+        condition: service_healthy
+      ml-service:
+        condition: service_started
+      migrator:
+        condition: service_completed_successfully
     restart: unless-stopped
     networks:
       - app-network
     tmpfs:
       - /tmp
 
+  # Init Container for Migrations
+  migrator:
+    build:
+      context: ./api
+      dockerfile: dockerfile
+      target: build
+    command: pnpm run prisma:deploy
+    env_file: api/.env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+
   # Python/FastAPI ML Microservice
   ml-service:
     container_name: snapandgo_ml_service
     build:
-      context: ./services/ml-service
+      context: ./ml-service
       dockerfile: dockerfile
     ports:
       - "8000:8000"
@@ -36,12 +54,19 @@ services:
   db:
     image: mysql:8.0
     container_name: snapandgo_db
-    env_file: .env
+    env_file: api/.env
     ports:
       - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
     volumes:
       - mysql_snapandgo_data:/var/lib/mysql
+    networks:
+      - app-network
 
 networks:
   app-network:

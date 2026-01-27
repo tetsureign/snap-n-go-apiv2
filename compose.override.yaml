@@ -6,16 +6,42 @@ services:
     profiles:
       - donotstart
 
-  # Add the development-only volume mount for live code reloading
+  # Disable the db migrator that's only meant for prod
+  migrator:
+    profiles:
+      - donotstart
+
+  # Add the development-only volume mount for live code reloading on ml-service
   ml-service:
     volumes:
-      - ./services/ml-service:/yolov5-snap-go
+      - ./ml-service:/yolov5-snap-go
     restart: "no"
 
-  # The db service inherits its configuration from the base compose.yaml
-  # so we don't need to add anything for it here.
+  # Don't start the prod db service
   db:
+    profiles:
+      - donotstart
+
+  # Separate DB service for development
+  db-dev:
+    image: mysql:8.0
+    container_name: snapandgo_db_dev
+    env_file: api/.env.dev
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: "no"
+    volumes:
+      - mysql_snapandgo_dev_data:/var/lib/mysql
+    networks:
+      - app-network
 
 networks:
   app-network: {}
+
+volumes:
+  mysql_snapandgo_dev_data:

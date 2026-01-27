@@ -2,19 +2,23 @@
 .gitignore
 .vscode
 .idea
-*.md
+**/*.md
 
 # Docker-related files
 compose.yaml
 compose.override.yaml
 
 # Node-specific
-node_modules
-dist
-generated
-__tests__
-__mocks__
-vitest.config.mts
+**/node_modules
+**/dist
+**/generated
+**/__tests__
+**/__mocks__
+**/vitest.config.mts
+**/*.tsbuildinfo
+**/*.log
+**/.env
+**/.env.*
 
 # Exclude Python microservice files. It will be built on a separate Dockerfile
 services/ml-service

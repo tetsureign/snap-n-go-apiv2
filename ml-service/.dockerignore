@@ -11,3 +11,10 @@ htmlcov/
 *.txt
 !requirements.txt
 create.py
+*.pt
+# If you want to bake a local model into the image, un-ignore it below:
+# !best.pt
+
+aws
+tests/
+dockerfile

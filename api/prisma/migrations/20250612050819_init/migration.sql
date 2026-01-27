@@ -1,19 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the `search_history` table. If the table is not empty, all the data it contains will be lost.
-  - You are about to drop the `users` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropForeignKey
-ALTER TABLE `search_history` DROP FOREIGN KEY `search_history_user_id_foreign`;
-
--- DropTable
-DROP TABLE `search_history`;
-
--- DropTable
-DROP TABLE `users`;
-
 -- CreateTable
 CREATE TABLE `SearchHistory` (
     `id` VARCHAR(191) NOT NULL,
