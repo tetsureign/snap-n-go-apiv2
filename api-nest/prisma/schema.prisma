@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model SearchHistory {
+  id          String    @id @default(uuid())
+  userId      String
+  searchQuery String
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model User {
+  id            String          @id @default(uuid())
+  googleId      String?         @unique
+  facebookId    String?         @unique
+  discordId     String?         @unique
+  githubId      String?         @unique
+  email         String          @unique
+  name          String
+  createdAt     DateTime        @default(now())
+  deletedAt     DateTime?
+  searchHistory SearchHistory[]
+}
