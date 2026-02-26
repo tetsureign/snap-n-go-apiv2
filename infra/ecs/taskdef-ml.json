@@ -1,0 +1,43 @@
+{
+  "family": "snap-n-go-ml",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "3072",
+  "executionRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/snap-n-go-ml-task-role",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "containerDefinitions": [
+    {
+      "name": "ml-service",
+      "image": "ghcr.io/tetsureign/snap-n-go-apiv2/ml-service:<IMAGE_TAG_OR_DIGEST>",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "readonlyRootFilesystem": true,
+      "healthCheck": {
+        "command": ["CMD-SHELL", "wget -qO- http://localhost:8000/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 45
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/snap-n-go-ml",
+          "awslogs-create-group": "true",
+          "awslogs-region": "<REGION>",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
