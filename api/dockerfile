@@ -18,6 +18,12 @@ RUN DATABASE_URL="mysql://build:3306/build" pnpm run prisma:generate
 RUN pnpm run build
 RUN pnpm prune --prod
 
+# Dedicated one-shot migration target.
+# Can be used by both docker compose (init-style service) and ECS RunTask jobs.
+FROM deps AS migrator
+COPY prisma ./prisma
+CMD ["pnpm", "run", "prisma:deploy"]
+
 FROM node:lts-alpine3.23 AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
