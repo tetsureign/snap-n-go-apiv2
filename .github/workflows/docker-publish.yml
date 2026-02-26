@@ -54,7 +54,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # 2. Build and Push Migrator Service (Target: build)
+      # 2. Build and Push Migrator Service (Target: migrator)
       - name: Extract Docker metadata (Migrator)
         id: meta-migrator
         uses: docker/metadata-action@v5
@@ -66,7 +66,7 @@ jobs:
         with:
           context: ./api
           file: ./api/dockerfile
-          target: build
+          target: migrator
           push: true
           tags: ${{ steps.meta-migrator.outputs.tags }}
           labels: ${{ steps.meta-migrator.outputs.labels }}
