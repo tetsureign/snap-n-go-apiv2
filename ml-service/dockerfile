@@ -1,24 +1,36 @@
+# syntax=docker/dockerfile:1.7
+
 FROM python:3.11-slim-bookworm AS base
+ENV PATH="/opt/venv/bin:$PATH" \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
 
 FROM base AS builder
 WORKDIR /deps-install
 COPY ./requirements.txt .
-RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
-RUN pip install --no-cache-dir -r requirements.txt
-# Remove the standard opencv-python installed by ultralytics to avoid libGL errors
-# And re-install headless to ensure cv2 is present
-RUN pip uninstall -y opencv-python
-RUN pip install --no-cache-dir "opencv-python-headless<=4.12.0.88"
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu && \
+    pip install -r requirements.txt && \
+    # Remove the standard opencv-python installed by ultralytics to avoid libGL errors
+    # and re-install headless to ensure cv2 is present.
+    pip uninstall -y opencv-python && \
+    pip install "opencv-python-headless<=4.12.0.88"
 
-FROM base
+FROM base AS runtime
 # Install libglib2.0-0 for libgthread (required by OpenCV/Torch internals)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
+
+RUN addgroup --system app && adduser --system --ingroup app app
+
 COPY --from=builder /opt/venv /opt/venv
 WORKDIR /yolov5-snap-go
-COPY ./ .
-CMD [ "python", "main.py" ]
+COPY --chown=app:app ./ ./
+
+USER app
 EXPOSE 8000
+CMD [ "python", "main.py" ]
