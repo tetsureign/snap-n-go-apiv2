@@ -1,0 +1,61 @@
+{
+  "family": "snap-n-go-api",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/snap-n-go-api-task-role",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "ephemeralStorage": {
+    "sizeInGiB": 40
+  },
+  "containerDefinitions": [
+    {
+      "name": "main-api",
+      "image": "ghcr.io/tetsureign/snap-n-go-apiv2/api:<IMAGE_TAG_OR_DIGEST>",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "protocol": "tcp",
+          "appProtocol": "http"
+        }
+      ],
+      "environment": [
+        { "name": "NODE_ENV", "value": "production" },
+        { "name": "PORT", "value": "3000" },
+        { "name": "ROUTE_PREFIX", "value": "api" },
+        { "name": "UPLOAD_TEMP_DIR", "value": "/tmp/uploads" },
+        { "name": "YOLO_SERVICE_URL", "value": "http://snap-n-go-ml.local:8000" },
+        { "name": "CORS_ORIGINS", "value": "https://<YOUR_FRONTEND_DOMAIN>" }
+      ],
+      "secrets": [
+        { "name": "DATABASE_URL", "valueFrom": "arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:snap-n-go/DATABASE_URL" },
+        { "name": "JWT_SECRET", "valueFrom": "arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:snap-n-go/JWT_SECRET" },
+        { "name": "REFRESH_SECRET", "valueFrom": "arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:snap-n-go/REFRESH_SECRET" },
+        { "name": "GOOGLE_CLIENT_ID", "valueFrom": "arn:aws:secretsmanager:<REGION>:<ACCOUNT_ID>:secret:snap-n-go/GOOGLE_CLIENT_ID" }
+      ],
+      "readonlyRootFilesystem": true,
+      "healthCheck": {
+        "command": ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 30
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/snap-n-go-api",
+          "awslogs-create-group": "true",
+          "awslogs-region": "<REGION>",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}

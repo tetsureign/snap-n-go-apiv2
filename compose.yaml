@@ -29,8 +29,7 @@ services:
     build:
       context: ./api
       dockerfile: dockerfile
-      target: build
-    command: pnpm run prisma:deploy
+      target: migrator
     env_file: api/.env
     depends_on:
       db:
