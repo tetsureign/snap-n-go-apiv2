@@ -47,6 +47,7 @@ if (corsOriginsEnv) {
 }
 
 const app = fastify({
+  trustProxy: true,
   logger: {
     transport: {
       target: "pino-pretty",
@@ -124,6 +125,11 @@ async function bootstrap() {
   await app.register(detectRouter, { prefix: `${routePrefix}/detect` });
   await app.register(userRouter, { prefix: `${routePrefix}/user` });
   await app.register(historyRouter, { prefix: `${routePrefix}/history` });
+
+  // Health check endpoint
+  app.get("/health", async () => {
+    return { status: "ok" };
+  });
 
   const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 

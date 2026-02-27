@@ -31,6 +31,10 @@ async def detect_image(file:bytes = File()):
     labels = detect.predict(image)
     return labels
 
+@app.get('/health')
+async def health():
+    return {"status": "ok"}
+
 
 # @app.post('/api/v1/yolo-obj-detect/images/predict')
 # async def detect_image(file:bytes = File()):
