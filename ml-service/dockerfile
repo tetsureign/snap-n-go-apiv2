@@ -20,6 +20,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install "opencv-python-headless<=4.12.0.88"
 
 FROM base AS runtime
+ENV HOME="/tmp" \
+    XDG_CACHE_HOME="/tmp/.cache" \
+    TORCH_HOME="/tmp/.cache/torch"
 # Install libglib2.0-0 for libgthread (required by OpenCV/Torch internals)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libglib2.0-0 \
