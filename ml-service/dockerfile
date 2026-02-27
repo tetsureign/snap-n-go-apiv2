@@ -14,6 +14,7 @@ COPY ./requirements.txt .
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu && \
     pip install -r requirements.txt && \
+    pip install "gitpython>=3.1.30" && \
     # Remove the standard opencv-python installed by ultralytics to avoid libGL errors
     # and re-install headless to ensure cv2 is present.
     pip uninstall -y opencv-python && \
@@ -33,6 +34,8 @@ RUN addgroup --system app && adduser --system --ingroup app app
 COPY --from=builder /opt/venv /opt/venv
 WORKDIR /yolov5-snap-go
 COPY --chown=app:app ./ ./
+
+RUN chown -R app:app /opt/venv /yolov5-snap-go /tmp
 
 USER app
 EXPOSE 8000
