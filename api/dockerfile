@@ -16,6 +16,9 @@ COPY . .
 # Using a dummy env to run Prisma Generate
 RUN DATABASE_URL="mysql://build:3306/build" pnpm run prisma:generate
 RUN pnpm run build
+
+# Production dependency subset for runtime image only.
+FROM deps AS prod-deps
 RUN pnpm prune --prod
 
 # Dedicated one-shot migration target.
@@ -31,7 +34,7 @@ ENV NODE_ENV=production
 RUN addgroup -S app && adduser -S app -G app
 
 COPY --from=build /app/package.json ./package.json
-COPY --from=build /app/node_modules ./node_modules
+COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 
 USER app
