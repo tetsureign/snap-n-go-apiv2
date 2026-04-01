@@ -21,11 +21,11 @@ export class AuthGuard implements CanActivate {
 
     try {
       const payload = this.authService.verifyAccessToken(token);
-
       request.user = payload;
     } catch {
       throw new UnauthorizedException();
     }
+
     return true;
   }
 
