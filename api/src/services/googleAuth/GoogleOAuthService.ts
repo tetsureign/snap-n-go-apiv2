@@ -3,8 +3,11 @@ import { OAuth2Client } from "google-auth-library";
 import IOAuthService from "@/interfaces/IOAuthService";
 import IOAuthConfigService from "@/interfaces/IOAuthConfigService";
 import IJwtService from "@/interfaces/IJwtService";
+import { OAuthProvider } from "@/types/auth";
 
 import userService from "@/services/userService";
+
+const GOOGLE_PROVIDER: OAuthProvider = "google";
 
 export default class GoogleOAuthService implements IOAuthService {
   private oauth2Client: OAuth2Client;
@@ -35,7 +38,8 @@ export default class GoogleOAuthService implements IOAuthService {
 
     const { accessToken, refreshToken } = this.jwtService.generateTokens({
       userId: user.id,
-      googleId: user.googleId,
+      provider: GOOGLE_PROVIDER,
+      providerUserId: user.googleId,
     });
 
     return { user, accessToken, refreshToken };

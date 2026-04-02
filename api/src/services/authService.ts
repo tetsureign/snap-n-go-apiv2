@@ -4,18 +4,17 @@ import IOAuthService from "@/interfaces/IOAuthService";
 import GoogleOAuthConfigService from "@/services/googleAuth/GoogleOAuthConfigService";
 import GoogleJwtService from "@/services/googleAuth/GoogleJwtService";
 import GoogleOAuthService from "@/services/googleAuth/GoogleOAuthService";
+import { OAuthProvider } from "@/types/auth";
 
 const configService = new GoogleOAuthConfigService();
 const jwtService: IJwtService = new GoogleJwtService(configService);
 
-type OauthProviders = "google";
-
 const oauthProviders = {
   google: new GoogleOAuthService(configService, jwtService),
-} satisfies Record<OauthProviders, IOAuthService>;
+} satisfies Record<OAuthProvider, IOAuthService>;
 
 function getOAuthProvider(provider: string): IOAuthService {
-  const normalizedProvider = provider.toLowerCase() as OauthProviders;
+  const normalizedProvider = provider.toLowerCase() as OAuthProvider;
   const oauthProvider = oauthProviders[normalizedProvider];
 
   if (!oauthProvider) {

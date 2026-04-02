@@ -6,7 +6,6 @@ import {
   handleDeleteMyQueryHistory,
   handleGetMyHistoryLazy,
 } from "@/controllers/historyController";
-import { authenticator } from "@/middlewares/authenticator";
 import historyRequestSchemas from "@/schemas/historyRequestSchemas";
 import { historySchema } from "@/schemas/historySchemas";
 import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
@@ -15,7 +14,7 @@ const historyRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().post(
     "/me",
     {
-      preHandler: authenticator,
+      preHandler: fastify.authenticate,
       schema: {
         body: historyRequestSchemas.addMySearchQuerySchema,
         response: {
@@ -31,7 +30,7 @@ const historyRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().get(
     "/me",
     {
-      preHandler: authenticator,
+      preHandler: fastify.authenticate,
       schema: {
         querystring: historyRequestSchemas.getMyHistoryLazySchema,
         response: {
@@ -47,7 +46,7 @@ const historyRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().delete(
     "/me",
     {
-      preHandler: authenticator,
+      preHandler: fastify.authenticate,
       schema: {
         body: historyRequestSchemas.delMyQuerySchema,
         response: {

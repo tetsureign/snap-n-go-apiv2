@@ -5,7 +5,6 @@ import {
   handleGetMyInfo,
   handleSoftDelUser,
 } from "@/controllers/userController";
-import { authenticator } from "@/middlewares/authenticator";
 import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 import { userSchema } from "@/schemas/userSchemas";
 
@@ -13,7 +12,7 @@ const userRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().get(
     "/me",
     {
-      preHandler: authenticator,
+      preHandler: fastify.authenticate,
       schema: {
         description: "Get current user info",
         tags: ["User"],
@@ -28,7 +27,7 @@ const userRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().delete(
     "/me/delete",
     {
-      preHandler: authenticator,
+      preHandler: fastify.authenticate,
       schema: {
         description: "Soft delete current user",
         tags: ["User"],

@@ -13,6 +13,7 @@ import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 
 import errorHandler from "@/middlewares/errorHandler";
+import authPlugin from "@/plugins/auth";
 import authRouter from "@/routes/authRoute";
 import detectRouter from "@/routes/detectionRoute";
 import historyRouter from "@/routes/historyRoute";
@@ -89,6 +90,7 @@ export async function registerApp(app: FastifyInstance): Promise<FastifyInstance
       fileSize: FILE_SIZE_LIMIT,
     },
   });
+  await app.register(authPlugin);
 
   await app.register(swagger, {
     openapi: {

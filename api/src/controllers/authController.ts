@@ -5,11 +5,12 @@ import authSchemas from "@/schemas/authSchemas";
 import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 import { toUserDTO, userSchema } from "@/schemas/userSchemas";
 import authService from "@/services/authService";
+import { OAuthProvider } from "@/types/auth";
 
 type TokenBody = z.infer<typeof authSchemas.tokenBodySchema>;
 
 export const handleOAuthLogin = async (
-  req: FastifyRequest<{ Body: TokenBody; Params: { provider: string } }>,
+  req: FastifyRequest<{ Body: TokenBody; Params: { provider: OAuthProvider } }>,
   reply: FastifyReply,
 ) => {
   try {
