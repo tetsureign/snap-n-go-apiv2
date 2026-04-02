@@ -1,27 +1,34 @@
 import { OAuth2Client } from "google-auth-library";
 
 import { BadRequestError, UnauthorizedError } from "@/errors/appError";
-import IOAuthService from "@/interfaces/IOAuthService";
-import IOAuthConfigService from "@/interfaces/IOAuthConfigService";
-import IJwtService from "@/interfaces/IJwtService";
-import { OAuthProvider } from "@/types/auth";
+import { AuthConfig, JwtService, OAuthProvider, OAuthService } from "@/types/auth";
 
 import userService from "@/services/userService";
 
 const GOOGLE_PROVIDER: OAuthProvider = "google";
 
-export default class GoogleOAuthService implements IOAuthService {
-  private oauth2Client: OAuth2Client;
+export function createGoogleOAuthService(
+  config: AuthConfig,
+  jwtService: JwtService,
+): OAuthService {
+  const oauth2Client = new OAuth2Client(config.clientId);
 
-  constructor(
-    private configService: IOAuthConfigService,
-    private jwtService: IJwtService,
-  ) {
-    this.oauth2Client = new OAuth2Client(this.configService.clientId);
+  async function verifyToken(idToken: string) {
+    try {
+      const ticket = await oauth2Client.verifyIdToken({
+        idToken,
+        audience: config.clientId,
+      });
+
+      return ticket.getPayload();
+    } catch (error) {
+      console.error(error, "Error verifying Google token.");
+      return null;
+    }
   }
 
-  async loginWithToken(token: string) {
-    const googleUser = await this.verifyToken(token);
+  async function loginWithToken(token: string) {
+    const googleUser = await verifyToken(token);
     if (!googleUser) throw new UnauthorizedError("Invalid Google token.");
 
     const { sub: googleId, email, name } = googleUser;
@@ -37,7 +44,7 @@ export default class GoogleOAuthService implements IOAuthService {
       throw new BadRequestError("No Google ID found.");
     }
 
-    const { accessToken, refreshToken } = this.jwtService.generateTokens({
+    const { accessToken, refreshToken } = jwtService.generateTokens({
       userId: user.id,
       provider: GOOGLE_PROVIDER,
       providerUserId: user.googleId,
@@ -46,17 +53,8 @@ export default class GoogleOAuthService implements IOAuthService {
     return { user, accessToken, refreshToken };
   }
 
-  async verifyToken(idToken: string) {
-    try {
-      const ticket = await this.oauth2Client.verifyIdToken({
-        idToken,
-        audience: this.configService.clientId,
-      });
-
-      return ticket.getPayload();
-    } catch (error) {
-      console.error(error, "Error verifying Google token.");
-      return null;
-    }
-  }
+  return {
+    loginWithToken,
+    verifyToken,
+  };
 }

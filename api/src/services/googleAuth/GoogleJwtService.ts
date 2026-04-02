@@ -1,33 +1,26 @@
 import * as jwt from "jsonwebtoken";
 import { BadRequestError, UnauthorizedError } from "@/errors/appError";
 import userService from "@/services/userService";
-import IJwtService from "@/interfaces/IJwtService";
-import IOAuthConfigService from "@/interfaces/IOAuthConfigService";
 import { AuthToken } from "@/types";
-import { OAuthProvider } from "@/types/auth";
+import { AuthConfig, JwtService, OAuthProvider } from "@/types/auth";
 
 const GOOGLE_PROVIDER: OAuthProvider = "google";
 
-export default class GoogleJwtService implements IJwtService {
-  constructor(private configService: IOAuthConfigService) {}
-
-  generateTokens(payload: AuthToken) {
+export function createGoogleJwtService(config: AuthConfig): JwtService {
+  function generateTokens(payload: AuthToken) {
     return {
-      accessToken: jwt.sign(payload, this.configService.jwtSecret, {
-        expiresIn: this.configService.accessTokenExpiry,
+      accessToken: jwt.sign(payload, config.jwtSecret, {
+        expiresIn: config.accessTokenExpiry,
       } as jwt.SignOptions),
-      refreshToken: jwt.sign(payload, this.configService.refreshSecret, {
-        expiresIn: this.configService.refreshTokenExpiry,
+      refreshToken: jwt.sign(payload, config.refreshSecret, {
+        expiresIn: config.refreshTokenExpiry,
       } as jwt.SignOptions),
     };
   }
 
-  async refreshToken(token: string) {
+  async function refreshToken(token: string) {
     try {
-      const decoded = jwt.verify(
-        token,
-        this.configService.refreshSecret
-      ) as AuthToken;
+      const decoded = jwt.verify(token, config.refreshSecret) as AuthToken;
 
       if (decoded.provider !== GOOGLE_PROVIDER) {
         throw new BadRequestError("Unsupported provider.");
@@ -43,7 +36,7 @@ export default class GoogleJwtService implements IJwtService {
         throw new BadRequestError("No Google ID found.");
       }
 
-      const { accessToken, refreshToken } = this.generateTokens({
+      const { accessToken, refreshToken } = generateTokens({
         userId: user.id,
         provider: GOOGLE_PROVIDER,
         providerUserId: user.googleId,
@@ -54,4 +47,9 @@ export default class GoogleJwtService implements IJwtService {
       throw new UnauthorizedError("Session expired or invalid token.");
     }
   }
+
+  return {
+    generateTokens,
+    refreshToken,
+  };
 }

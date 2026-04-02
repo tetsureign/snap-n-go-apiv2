@@ -1,20 +1,25 @@
-import IJwtService from "@/interfaces/IJwtService";
-import IOAuthService from "@/interfaces/IOAuthService";
 import { BadRequestError } from "@/errors/appError";
+import { env } from "@/config/env";
 
-import GoogleOAuthConfigService from "@/services/googleAuth/GoogleOAuthConfigService";
-import GoogleJwtService from "@/services/googleAuth/GoogleJwtService";
-import GoogleOAuthService from "@/services/googleAuth/GoogleOAuthService";
-import { OAuthProvider } from "@/types/auth";
+import { createGoogleJwtService } from "@/services/googleAuth/GoogleJwtService";
+import { createGoogleOAuthService } from "@/services/googleAuth/GoogleOAuthService";
+import { AuthConfig, JwtService, OAuthProvider, OAuthService } from "@/types/auth";
 
-const configService = new GoogleOAuthConfigService();
-const jwtService: IJwtService = new GoogleJwtService(configService);
+const authConfig: AuthConfig = {
+  jwtSecret: env.jwtSecret,
+  refreshSecret: env.refreshSecret,
+  clientId: env.googleClientId,
+  accessTokenExpiry: "1h",
+  refreshTokenExpiry: "30d",
+};
+
+const jwtService: JwtService = createGoogleJwtService(authConfig);
 
 const oauthProviders = {
-  google: new GoogleOAuthService(configService, jwtService),
-} satisfies Record<OAuthProvider, IOAuthService>;
+  google: createGoogleOAuthService(authConfig, jwtService),
+} satisfies Record<OAuthProvider, OAuthService>;
 
-function getOAuthProvider(provider: string): IOAuthService {
+function getOAuthProvider(provider: string): OAuthService {
   const normalizedProvider = provider.toLowerCase() as OAuthProvider;
   const oauthProvider = oauthProviders[normalizedProvider];
 
