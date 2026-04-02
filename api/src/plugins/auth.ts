@@ -1,19 +1,13 @@
 import fastifyJwt from "@fastify/jwt";
 import { FastifyPluginAsync } from "fastify";
 
+import { env } from "@/config/env";
 import { ForbiddenError, UnauthorizedError } from "@/errors/appError";
-import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 import { AuthToken } from "@/types";
 
 const authPlugin: FastifyPluginAsync = async (fastify) => {
-  const jwtSecret = process.env.JWT_SECRET;
-
-  if (!jwtSecret) {
-    throw new Error("JWT_SECRET environment variable is required");
-  }
-
   await fastify.register(fastifyJwt, {
-    secret: jwtSecret,
+    secret: env.jwtSecret,
   });
 
   fastify.decorate("authenticate", async function authenticate(request, reply) {

@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { Readable } from "stream";
+import { env } from "@/config/env";
 
 /**
  * Saves a file stream to disk in the temporary upload directory
@@ -12,8 +13,7 @@ export const saveFileToTemp = async (
   fileStream: Readable,
   filename: string
 ): Promise<string> => {
-  const uploadDir = process.env.UPLOAD_TEMP_DIR || "/tmp";
-  const filePath = path.join(uploadDir, filename);
+  const filePath = path.join(env.uploadTempDir, filename);
 
   const writeStream = fs.createWriteStream(filePath);
 
@@ -40,4 +40,3 @@ export const deleteFile = (
     }
   });
 };
-

@@ -1,14 +1,12 @@
 import path from "path";
 import fs from "fs";
+import { env } from "@/config/env";
 
 export const pathChecking = (filePath: string) => {
   if (!filePath) throw new Error("File path is required.");
-
-  const UPLOAD_TEMP_DIR = process.env.UPLOAD_TEMP_DIR || "/tmp";
-
   const resolvedPath = path.resolve(path.normalize(filePath));
 
-  if (!resolvedPath.startsWith(UPLOAD_TEMP_DIR))
+  if (!resolvedPath.startsWith(env.uploadTempDir))
     throw new Error("Path outside allowed directory.");
 
   try {

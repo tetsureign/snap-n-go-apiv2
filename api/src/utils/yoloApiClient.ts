@@ -1,7 +1,8 @@
 import axios from "axios";
+import { env } from "@/config/env";
 
 const yoloApiClient = axios.create({
-  baseURL: process.env.YOLO_SERVICE_URL,
+  baseURL: env.yoloServiceUrl,
   timeout: 5000,
   headers: {
     "Content-Type": "multipart/form-data",

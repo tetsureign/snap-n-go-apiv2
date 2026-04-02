@@ -12,6 +12,7 @@ import rateLimit from "@fastify/rate-limit";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 
+import { env } from "@/config/env";
 import errorHandler from "@/middlewares/errorHandler";
 import authPlugin from "@/plugins/auth";
 import authRouter from "@/routes/authRoute";
@@ -22,23 +23,6 @@ import userRouter from "@/routes/userRoute";
 const RATE_LIMITER_WINDOW_MS = 15 * 60 * 1000;
 const RATE_LIMITER_MAX = 100;
 const FILE_SIZE_LIMIT = 5 * 1024 * 1024;
-
-function getCorsOrigins(): string[] | RegExp[] {
-  const isProduction = process.env.NODE_ENV === "production";
-  const corsOriginsEnv = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN;
-
-  if (corsOriginsEnv) {
-    return corsOriginsEnv.split(",").map((origin) => origin.trim());
-  }
-
-  if (isProduction) {
-    throw new Error(
-      "CORS_ORIGINS or CORS_ORIGIN environment variable is required in production",
-    );
-  }
-
-  return [/^http:\/\/localhost:\d+$/, /^http:\/\/127\.0\.0\.1:\d+$/];
-}
 
 export function buildApp(): FastifyInstance {
   const app = fastify({
@@ -51,7 +35,7 @@ export function buildApp(): FastifyInstance {
           ignore: "pid,hostname",
         },
       },
-      level: process.env.NODE_ENV === "production" ? "info" : "debug",
+      level: env.isProduction ? "info" : "debug",
     },
     ajv: {
       customOptions: {
@@ -66,9 +50,6 @@ export function buildApp(): FastifyInstance {
 }
 
 export async function registerApp(app: FastifyInstance): Promise<FastifyInstance> {
-  const routePrefix = process.env.ROUTE_PREFIX || "";
-  const corsOrigins = getCorsOrigins();
-
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
 
@@ -79,7 +60,7 @@ export async function registerApp(app: FastifyInstance): Promise<FastifyInstance
   });
 
   await app.register(cors, {
-    origin: corsOrigins,
+    origin: env.corsOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
     credentials: true,
@@ -105,15 +86,15 @@ export async function registerApp(app: FastifyInstance): Promise<FastifyInstance
   });
 
   await app.register(swaggerUI, {
-    routePrefix: `${routePrefix}/docs`,
+    routePrefix: `${env.routePrefix}/docs`,
   });
 
   app.setErrorHandler(errorHandler);
 
-  await app.register(authRouter, { prefix: `${routePrefix}/auth` });
-  await app.register(detectRouter, { prefix: `${routePrefix}/detect` });
-  await app.register(userRouter, { prefix: `${routePrefix}/user` });
-  await app.register(historyRouter, { prefix: `${routePrefix}/history` });
+  await app.register(authRouter, { prefix: `${env.routePrefix}/auth` });
+  await app.register(detectRouter, { prefix: `${env.routePrefix}/detect` });
+  await app.register(userRouter, { prefix: `${env.routePrefix}/user` });
+  await app.register(historyRouter, { prefix: `${env.routePrefix}/history` });
 
   app.get("/health", async () => {
     return { status: "ok" };
