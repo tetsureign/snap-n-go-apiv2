@@ -11,9 +11,7 @@ import multipart from "@fastify/multipart";
 import rateLimit from "@fastify/rate-limit";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
-import { fastifyAwilixPlugin } from "@fastify/awilix";
 
-import container from "@/container/dependencyInjection";
 import errorHandler from "@/middlewares/errorHandler";
 import authRouter from "@/routes/authRoute";
 import detectRouter from "@/routes/detectionRoute";
@@ -91,14 +89,6 @@ export async function registerApp(app: FastifyInstance): Promise<FastifyInstance
       fileSize: FILE_SIZE_LIMIT,
     },
   });
-
-  await app.register(fastifyAwilixPlugin, {
-    disposeOnClose: true,
-    disposeOnResponse: true,
-    strictBooleanEnforced: true,
-  });
-
-  app.diContainer.register(container.registrations);
 
   await app.register(swagger, {
     openapi: {

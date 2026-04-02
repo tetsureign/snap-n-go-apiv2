@@ -11,7 +11,7 @@ export default class GoogleOAuthService implements IOAuthService {
 
   constructor(
     private configService: IOAuthConfigService,
-    private jwtService: IJwtService
+    private jwtService: IJwtService,
   ) {
     this.oauth2Client = new OAuth2Client(this.configService.clientId);
   }
@@ -21,7 +21,6 @@ export default class GoogleOAuthService implements IOAuthService {
     if (!googleUser) throw new Error("Invalid Google token.");
 
     const { sub: googleId, email, name } = googleUser;
-
     if (!googleId || !email || !name)
       throw new Error("Missing Google user info.");
 
@@ -30,7 +29,6 @@ export default class GoogleOAuthService implements IOAuthService {
       email,
       name,
     });
-
     if (!user.googleId) {
       throw new Error("No Google ID found.");
     }
