@@ -3,6 +3,7 @@ import fs from "fs";
 import { z } from "zod";
 
 import detectionSchemas from "@/schemas/detectionSchemas";
+import { ExternalServiceError } from "@/errors/appError";
 import { pathChecking } from "@/utils/pathChecking";
 import yoloApiClient from "@/utils/yoloApiClient";
 
@@ -29,7 +30,7 @@ async function sendImageToYolo(imagePath: string) {
 
     return detectionResult;
   } catch (error) {
-    throw new Error("Error sending image to microservice: " + error);
+    throw new ExternalServiceError("Error sending image to microservice");
   }
 }
 

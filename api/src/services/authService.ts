@@ -1,5 +1,6 @@
 import IJwtService from "@/interfaces/IJwtService";
 import IOAuthService from "@/interfaces/IOAuthService";
+import { BadRequestError } from "@/errors/appError";
 
 import GoogleOAuthConfigService from "@/services/googleAuth/GoogleOAuthConfigService";
 import GoogleJwtService from "@/services/googleAuth/GoogleJwtService";
@@ -18,7 +19,7 @@ function getOAuthProvider(provider: string): IOAuthService {
   const oauthProvider = oauthProviders[normalizedProvider];
 
   if (!oauthProvider) {
-    throw new Error(`Unsupported OAuth provider: ${provider}`);
+    throw new BadRequestError(`Unsupported OAuth provider: ${provider}`);
   }
 
   return oauthProvider;

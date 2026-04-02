@@ -11,6 +11,7 @@ import {
   toHistoryDTOList,
 } from "@/schemas/historySchemas";
 import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
+import { requireAuthenticatedUser } from "@/utils/requireAuthenticatedUser";
 
 type AddMyQueryBody = z.infer<
   typeof historyRequestSchemas.addMySearchQuerySchema
@@ -24,69 +25,47 @@ type DeleteMyHistoryBody = z.infer<
 
 export const handleAddMyQueryHistory = async (
   req: AuthenticatedRequest<{ Body: AddMyQueryBody }>,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) => {
-  try {
-    const newHistoryEntry = await historyService.addSearchQueryHistory({
-      userId: req.user!.userId, // user is ensured through the auth middleware
-      query: req.body.query,
-    });
+  const user = requireAuthenticatedUser(req);
+  const newHistoryEntry = await historyService.addSearchQueryHistory({
+    userId: user.userId,
+    query: req.body.query,
+  });
 
-    return reply
-      .status(201)
-      .send(
-        zodResponseSchemas.ok(historySchema).parse({
-          data: toHistoryDTO(newHistoryEntry),
-        })
-      );
-  } catch (error) {
-    req.log.error(error, "Error adding search history.");
-    return reply.status(500).send(zodResponseSchemas.internalError.parse({}));
-  }
+  return reply
+    .status(201)
+    .send(
+      zodResponseSchemas.ok(historySchema).parse({
+        data: toHistoryDTO(newHistoryEntry),
+      }),
+    );
 };
 
 export const handleGetMyHistoryLazy = async (
   req: AuthenticatedRequest<{ Querystring: GetMyHistoryQuery }>,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) => {
-  try {
-    const { limit, cursor } = req.query;
+  const user = requireAuthenticatedUser(req);
+  const { limit, cursor } = req.query;
 
-    const entries = await historyService.getUserQueryHistoryLazy(
-      req.user!.userId,
-      limit,
-      cursor
-    );
+  const entries = await historyService.getUserQueryHistoryLazy(
+    user.userId,
+    limit,
+    cursor,
+  );
 
-    return reply.send(
-      zodResponseSchemas.ok(historySchema).parse({ data: toHistoryDTOList(entries) })
-    );
-  } catch (error) {
-    req.log.error({ error, req }, "Error fetching user's search history.");
-    return reply.status(500).send(zodResponseSchemas.internalError.parse({}));
-  }
+  return reply.send(
+    zodResponseSchemas.ok(historySchema).parse({ data: toHistoryDTOList(entries) }),
+  );
 };
 
 export const handleDeleteMyQueryHistory = async (
   req: AuthenticatedRequest<{ Body: DeleteMyHistoryBody }>,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) => {
-  try {
-    const result = await historyService.softDelQueryHistory(
-      req.user!.userId,
-      req.body.ids
-    );
+  const user = requireAuthenticatedUser(req);
+  await historyService.softDelQueryHistory(user.userId, req.body.ids);
 
-    if (!result)
-      return reply.status(404).send(
-        zodResponseSchemas.notFound.parse({
-          message: "History entries not found or already deleted.",
-        })
-      );
-
-    return reply.send(zodResponseSchemas.okEmpty.parse({}));
-  } catch (error) {
-    req.log.error(error, "Error soft deleting history.");
-    return reply.status(500).send(zodResponseSchemas.internalError.parse({}));
-  }
+  return reply.send(zodResponseSchemas.okEmpty.parse({}));
 };

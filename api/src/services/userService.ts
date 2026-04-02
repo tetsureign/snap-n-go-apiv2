@@ -1,3 +1,4 @@
+import { NotFoundError } from "@/errors/appError";
 import userRepository from "@/repositories/userRepository";
 
 async function getUserById(userId: string) {
@@ -35,7 +36,10 @@ async function createOrUpdateUser({
 
 async function softDeleteUser(userId: string) {
   const user = await userRepository.findById(userId);
-  if (!user) return false;
+  if (!user) {
+    throw new NotFoundError("User not found or already deleted");
+  }
+
   return userRepository.softDeleteById(userId);
 }
 

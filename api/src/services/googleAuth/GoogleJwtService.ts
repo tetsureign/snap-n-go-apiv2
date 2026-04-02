@@ -1,4 +1,5 @@
 import * as jwt from "jsonwebtoken";
+import { BadRequestError, UnauthorizedError } from "@/errors/appError";
 import userService from "@/services/userService";
 import IJwtService from "@/interfaces/IJwtService";
 import IOAuthConfigService from "@/interfaces/IOAuthConfigService";
@@ -29,17 +30,17 @@ export default class GoogleJwtService implements IJwtService {
       ) as AuthToken;
 
       if (decoded.provider !== GOOGLE_PROVIDER) {
-        throw new Error("Unsupported provider.");
+        throw new BadRequestError("Unsupported provider.");
       }
 
       const user = await userService.getUserByGoogleId(decoded.providerUserId);
 
       if (!user) {
-        throw new Error("Invalid token.");
+        throw new UnauthorizedError("Invalid token.");
       }
 
       if (!user.googleId) {
-        throw new Error("No Google ID found.");
+        throw new BadRequestError("No Google ID found.");
       }
 
       const { accessToken, refreshToken } = this.generateTokens({
@@ -50,7 +51,7 @@ export default class GoogleJwtService implements IJwtService {
 
       return { accessToken, refreshToken };
     } catch {
-      throw new Error("Session expired or invalid token.");
+      throw new UnauthorizedError("Session expired or invalid token.");
     }
   }
 }

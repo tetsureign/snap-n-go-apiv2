@@ -1,6 +1,7 @@
 import fastifyJwt from "@fastify/jwt";
 import { FastifyPluginAsync } from "fastify";
 
+import { ForbiddenError, UnauthorizedError } from "@/errors/appError";
 import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 import { AuthToken } from "@/types";
 
@@ -22,16 +23,10 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
       const token = request.headers.authorization?.split(" ")[1];
 
       if (!token) {
-        return reply.status(401).send(zodResponseSchemas.unauthorized.parse({}));
+        throw new UnauthorizedError();
       }
 
-      return reply
-        .status(403)
-        .send(
-          zodResponseSchemas.forbidden.parse({
-            message: "Invalid or expired token",
-          }),
-        );
+      throw new ForbiddenError("Invalid or expired token");
     }
   });
 };

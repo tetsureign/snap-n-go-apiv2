@@ -1,5 +1,6 @@
 import { OAuth2Client } from "google-auth-library";
 
+import { BadRequestError, UnauthorizedError } from "@/errors/appError";
 import IOAuthService from "@/interfaces/IOAuthService";
 import IOAuthConfigService from "@/interfaces/IOAuthConfigService";
 import IJwtService from "@/interfaces/IJwtService";
@@ -21,11 +22,11 @@ export default class GoogleOAuthService implements IOAuthService {
 
   async loginWithToken(token: string) {
     const googleUser = await this.verifyToken(token);
-    if (!googleUser) throw new Error("Invalid Google token.");
+    if (!googleUser) throw new UnauthorizedError("Invalid Google token.");
 
     const { sub: googleId, email, name } = googleUser;
     if (!googleId || !email || !name)
-      throw new Error("Missing Google user info.");
+      throw new BadRequestError("Missing Google user info.");
 
     const user = await userService.createOrUpdateUser({
       googleId,
@@ -33,7 +34,7 @@ export default class GoogleOAuthService implements IOAuthService {
       name,
     });
     if (!user.googleId) {
-      throw new Error("No Google ID found.");
+      throw new BadRequestError("No Google ID found.");
     }
 
     const { accessToken, refreshToken } = this.jwtService.generateTokens({

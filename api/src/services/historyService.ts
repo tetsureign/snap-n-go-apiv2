@@ -1,3 +1,4 @@
+import { NotFoundError } from "@/errors/appError";
 import historyRepository from "@/repositories/historyRepository";
 
 async function addSearchQueryHistory({
@@ -19,7 +20,13 @@ async function getUserQueryHistoryLazy(
 }
 
 async function softDelQueryHistory(userId: string, ids: string[]) {
-  return historyRepository.softDeleteUserScoped(userId, ids);
+  const deletedCount = await historyRepository.softDeleteUserScoped(userId, ids);
+
+  if (!deletedCount) {
+    throw new NotFoundError("History entries not found or already deleted.");
+  }
+
+  return deletedCount;
 }
 
 const historyService = {
