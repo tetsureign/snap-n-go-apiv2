@@ -1,10 +1,10 @@
 import { NotFoundError } from "@/errors/appError";
 import { FastifyReply } from "fastify";
 
+import { sendOk, sendOkEmpty } from "@/http/responses";
 import userService from "@/services/userService";
 
 import { AuthenticatedRequest } from "@/types";
-import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 import { toUserDTO, userSchema } from "@/schemas/userSchemas";
 import { requireAuthenticatedUser } from "@/utils/requireAuthenticatedUser";
 
@@ -19,9 +19,7 @@ export const handleGetMyInfo = async (
     throw new NotFoundError("User not found");
   }
 
-  return reply.send(
-    zodResponseSchemas.ok(userSchema).parse({ data: toUserDTO(foundUser) }),
-  );
+  return sendOk(reply, userSchema, toUserDTO(foundUser));
 };
 
 export const handleSoftDelUser = async (
@@ -31,5 +29,5 @@ export const handleSoftDelUser = async (
   const user = requireAuthenticatedUser(req);
   await userService.softDeleteUser(user.userId);
 
-  return reply.send(zodResponseSchemas.okEmpty.parse({}));
+  return sendOkEmpty(reply);
 };

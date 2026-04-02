@@ -1,8 +1,8 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 
+import { sendAuthSuccess, sendTokenRefresh } from "@/http/responses";
 import authSchemas from "@/schemas/authSchemas";
-import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 import { toUserDTO, userSchema } from "@/schemas/userSchemas";
 import authService from "@/services/authService";
 import { OAuthProvider } from "@/types/auth";
@@ -20,12 +20,12 @@ export const handleOAuthLogin = async (
     refreshToken: refresh,
   } = await authService.loginWithOAuthToken(provider, req.body.token);
 
-  return reply.status(201).send(
-    zodResponseSchemas.userCreated(userSchema).parse({
-      data: toUserDTO(user),
-      accessToken,
-      refreshToken: refresh,
-    }),
+  return sendAuthSuccess(
+    reply,
+    userSchema,
+    toUserDTO(user),
+    accessToken,
+    refresh,
   );
 };
 
@@ -36,10 +36,5 @@ export const handleRefreshToken = async (
   const { accessToken, refreshToken: refresh } =
     await authService.refreshToken(req.body.token);
 
-  return reply.status(200).send(
-    zodResponseSchemas.tokenRefreshed.parse({
-      accessToken,
-      refreshToken: refresh,
-    }),
-  );
+  return sendTokenRefresh(reply, accessToken, refresh);
 };

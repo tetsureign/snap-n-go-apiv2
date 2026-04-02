@@ -9,7 +9,9 @@ import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 import { userSchema } from "@/schemas/userSchemas";
 
 const userRouter: FastifyPluginAsync = async (fastify) => {
-  fastify.withTypeProvider<ZodTypeProvider>().get(
+  const app = fastify.withTypeProvider<ZodTypeProvider>();
+
+  app.get(
     "/me",
     {
       preHandler: fastify.authenticate,
@@ -24,7 +26,8 @@ const userRouter: FastifyPluginAsync = async (fastify) => {
     },
     handleGetMyInfo,
   );
-  fastify.withTypeProvider<ZodTypeProvider>().delete(
+
+  app.delete(
     "/me/delete",
     {
       preHandler: fastify.authenticate,

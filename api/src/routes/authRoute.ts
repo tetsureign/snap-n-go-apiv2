@@ -10,7 +10,9 @@ import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 import { userSchema } from "@/schemas/userSchemas";
 
 const authRouter: FastifyPluginAsync = async (fastify) => {
-  fastify.withTypeProvider<ZodTypeProvider>().post(
+  const app = fastify.withTypeProvider<ZodTypeProvider>();
+
+  app.post(
     "/login/oauth/:provider",
     {
       schema: {
@@ -27,7 +29,7 @@ const authRouter: FastifyPluginAsync = async (fastify) => {
     handleOAuthLogin,
   );
 
-  fastify.withTypeProvider<ZodTypeProvider>().post(
+  app.post(
     "/refresh",
     {
       schema: {

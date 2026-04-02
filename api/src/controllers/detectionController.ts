@@ -1,9 +1,9 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 
 import { BadRequestError } from "@/errors/appError";
+import { sendOkList } from "@/http/responses";
 import detectionService from "@/services/detectionService";
 
-import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 import detectionSchemas from "@/schemas/detectionSchemas";
 
 import { assertValidImageBuffer, isImageFile } from "@/utils/fileValidation";
@@ -35,9 +35,5 @@ export const handleDetection = async (
     mimeType: data.mimetype || "application/octet-stream",
   });
 
-  return reply.send(
-    zodResponseSchemas
-      .okList(detectionSchemas.detectionResult)
-      .parse({ data: detectionResult }),
-  );
+  return sendOkList(reply, detectionSchemas.detectionResult, detectionResult);
 };

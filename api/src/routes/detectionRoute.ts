@@ -6,7 +6,9 @@ import detectionSchemas from "@/schemas/detectionSchemas";
 import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 
 const detectRouter: FastifyPluginAsync = async (fastify) => {
-  fastify.withTypeProvider<ZodTypeProvider>().post(
+  const app = fastify.withTypeProvider<ZodTypeProvider>();
+
+  app.post(
     "/",
     {
       schema: {
