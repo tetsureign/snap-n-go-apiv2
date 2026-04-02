@@ -1,4 +1,4 @@
-import prisma from "prisma/client";
+import prisma from "$/prisma/client";
 import { z } from "zod";
 
 import { restore, softDelete } from "@/libs/softDelete";
@@ -104,7 +104,7 @@ export default class User {
 
   static async getByProviderId(
     provider: string,
-    providerId: string
+    providerId: string,
   ): Promise<User | null> {
     const whereClause = { [`${provider}Id`]: providerId } as any;
     const user = await prisma.user.findUnique({ where: whereClause });

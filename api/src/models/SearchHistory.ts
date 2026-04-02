@@ -1,5 +1,5 @@
 import { restore } from "@/libs/softDelete";
-import prisma from "prisma/client";
+import prisma from "$/prisma/client";
 import { z } from "zod";
 
 export const historySchema = z.object({
@@ -47,7 +47,7 @@ export default class SearchHistory {
   static async getUserHistory(
     userId: string,
     limit: number,
-    cursor?: string
+    cursor?: string,
   ): Promise<SearchHistory[]> {
     if (cursor) {
       const cursorItem = await prisma.searchHistory.findUnique({
@@ -79,7 +79,7 @@ export default class SearchHistory {
 
   static async softDeleteUserScoped(
     userId: string,
-    ids: string[]
+    ids: string[],
   ): Promise<number> {
     const result = await prisma.searchHistory.updateMany({
       where: {

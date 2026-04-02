@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { describe, expect, test, vi } from "vitest";
 import { faker } from "@faker-js/faker";
 
-import { prisma } from "prisma/__mocks__/client";
+import { prisma } from "$/prisma/__mocks__/client";
 
 import historyService from "@/services/historyService";
 
@@ -70,7 +71,7 @@ describe("historyService", () => {
           deletedAt: null,
         },
         take: limit,
-      })
+      }),
     );
   });
 
