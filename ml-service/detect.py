@@ -5,7 +5,7 @@ import random
 
 class YoloV5_Detect:
     def __init__(self):
-        self.model_detect = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+        self.model_detect = torch.hub.load('ultralytics/yolov5', 'yolov5s', trust_repo=True)
         self.objects = ['Người', 'Xe đạp', 'Ô tô', 'Xe máy', 'Máy bay',
         'Xe buýt', 'Tàu hỏa', 'Xe tải', 'Thuyền', 'Đèn giao thông',
         'Vòi cứu hỏa', 'Biển báo dừng', 'Đồng hồ đỗ xe', 'Ghế dài', 'Chim',
