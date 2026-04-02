@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import detectionSchemas from "@/schemas/detectionSchemas";
+import detectionSchemas from "@/modules/detection/detection.schemas";
 
 export type DetectionResult = z.infer<typeof detectionSchemas.detectionResult>;
 

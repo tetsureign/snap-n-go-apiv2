@@ -1,4 +1,4 @@
-import { UnauthorizedError } from "@/errors/appError";
+import { UnauthorizedError } from "@/shared/errors/appError";
 import { AuthenticatedRequest } from "@/types";
 
 export function requireAuthenticatedUser(req: AuthenticatedRequest) {

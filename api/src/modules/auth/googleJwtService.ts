@@ -1,8 +1,12 @@
 import * as jwt from "jsonwebtoken";
-import { BadRequestError, UnauthorizedError } from "@/errors/appError";
-import userService from "@/services/userService";
+import { BadRequestError, UnauthorizedError } from "@/shared/errors/appError";
+import userService from "@/modules/users/user.service";
 import { AuthToken } from "@/types";
-import { AuthConfig, JwtService, OAuthProvider } from "@/types/auth";
+import {
+  AuthConfig,
+  JwtService,
+  OAuthProvider,
+} from "@/modules/auth/auth.types";
 
 const GOOGLE_PROVIDER: OAuthProvider = "google";
 

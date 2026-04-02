@@ -1,11 +1,11 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 
-import { sendAuthSuccess, sendTokenRefresh } from "@/http/responses";
-import authSchemas from "@/schemas/authSchemas";
-import { toUserDTO, userSchema } from "@/schemas/userSchemas";
-import authService from "@/services/authService";
-import { OAuthProvider } from "@/types/auth";
+import { sendAuthSuccess, sendTokenRefresh } from "@/shared/http/responses";
+import authSchemas from "@/modules/auth/auth.schemas";
+import { toUserDTO, userSchema } from "@/modules/users/user.schemas";
+import authService from "@/modules/auth/auth.service";
+import { OAuthProvider } from "@/modules/auth/auth.types";
 
 type TokenBody = z.infer<typeof authSchemas.tokenBodySchema>;
 

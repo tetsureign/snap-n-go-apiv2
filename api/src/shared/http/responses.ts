@@ -1,7 +1,7 @@
 import { FastifyReply } from "fastify";
 import { z } from "zod";
 
-import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
+import zodResponseSchemas from "@/shared/http/responseSchemas";
 
 export function sendOk<T extends z.ZodTypeAny>(
   reply: FastifyReply,

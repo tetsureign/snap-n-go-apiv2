@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 
 import { prisma } from "$/prisma/__mocks__/client";
 
-import historyService from "@/services/historyService";
+import historyService from "@/modules/history/history.service";
 
 // Mock the Prisma client module that the repositories import
 vi.mock("$/prisma/client", () => ({

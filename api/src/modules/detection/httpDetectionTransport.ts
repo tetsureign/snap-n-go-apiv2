@@ -1,8 +1,11 @@
 import FormData from "form-data";
 
-import { ExternalServiceError } from "@/errors/appError";
-import { DetectionImage, DetectionTransport } from "@/types/detection";
-import yoloApiClient from "@/utils/yoloApiClient";
+import { ExternalServiceError } from "@/shared/errors/appError";
+import {
+  DetectionImage,
+  DetectionTransport,
+} from "@/modules/detection/detection.types";
+import yoloApiClient from "@/modules/detection/yoloApiClient";
 
 class HttpDetectionTransport implements DetectionTransport {
   async detectImage(image: DetectionImage) {

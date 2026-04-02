@@ -1,9 +1,9 @@
 import { FastifyPluginAsync } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
 
-import { handleDetection } from "@/controllers/detectionController";
-import detectionSchemas from "@/schemas/detectionSchemas";
-import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
+import { handleDetection } from "@/modules/detection/detection.controller";
+import detectionSchemas from "@/modules/detection/detection.schemas";
+import zodResponseSchemas from "@/shared/http/responseSchemas";
 
 const detectRouter: FastifyPluginAsync = async (fastify) => {
   const app = fastify.withTypeProvider<ZodTypeProvider>();

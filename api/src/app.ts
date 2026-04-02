@@ -13,12 +13,12 @@ import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 
 import { env } from "@/config/env";
-import errorHandler from "@/middlewares/errorHandler";
+import errorHandler from "@/shared/http/errorHandler";
 import authPlugin from "@/plugins/auth";
-import authRouter from "@/routes/authRoute";
-import detectRouter from "@/routes/detectionRoute";
-import historyRouter from "@/routes/historyRoute";
-import userRouter from "@/routes/userRoute";
+import authRouter from "@/modules/auth/auth.routes";
+import detectRouter from "@/modules/detection/detection.routes";
+import historyRouter from "@/modules/history/history.routes";
+import userRouter from "@/modules/users/user.routes";
 
 const RATE_LIMITER_WINDOW_MS = 15 * 60 * 1000;
 const RATE_LIMITER_MAX = 100;

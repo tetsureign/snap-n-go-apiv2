@@ -5,10 +5,10 @@ import {
   handleAddMyQueryHistory,
   handleDeleteMyQueryHistory,
   handleGetMyHistoryLazy,
-} from "@/controllers/historyController";
-import historyRequestSchemas from "@/schemas/historyRequestSchemas";
-import { historySchema } from "@/schemas/historySchemas";
-import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
+} from "@/modules/history/history.controller";
+import historyRequestSchemas from "@/modules/history/history.request.schemas";
+import { historySchema } from "@/modules/history/history.schemas";
+import zodResponseSchemas from "@/shared/http/responseSchemas";
 
 const historyRouter: FastifyPluginAsync = async (fastify) => {
   const app = fastify.withTypeProvider<ZodTypeProvider>();

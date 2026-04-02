@@ -4,10 +4,10 @@ import { ZodTypeProvider } from "fastify-type-provider-zod";
 import {
   handleOAuthLogin,
   handleRefreshToken,
-} from "@/controllers/authController";
-import authSchemas from "@/schemas/authSchemas";
-import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
-import { userSchema } from "@/schemas/userSchemas";
+} from "@/modules/auth/auth.controller";
+import authSchemas from "@/modules/auth/auth.schemas";
+import zodResponseSchemas from "@/shared/http/responseSchemas";
+import { userSchema } from "@/modules/users/user.schemas";
 
 const authRouter: FastifyPluginAsync = async (fastify) => {
   const app = fastify.withTypeProvider<ZodTypeProvider>();

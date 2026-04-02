@@ -2,7 +2,7 @@ import fastifyJwt from "@fastify/jwt";
 import { FastifyPluginAsync } from "fastify";
 
 import { env } from "@/config/env";
-import { ForbiddenError, UnauthorizedError } from "@/errors/appError";
+import { ForbiddenError, UnauthorizedError } from "@/shared/errors/appError";
 import { AuthToken } from "@/types";
 
 const authPlugin: FastifyPluginAsync = async (fastify) => {

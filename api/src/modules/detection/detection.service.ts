@@ -1,5 +1,5 @@
-import httpDetectionTransport from "@/transports/httpDetectionTransport";
-import { DetectionImage } from "@/types/detection";
+import httpDetectionTransport from "@/modules/detection/httpDetectionTransport";
+import { DetectionImage } from "@/modules/detection/detection.types";
 
 async function detectImage(image: DetectionImage) {
   return httpDetectionTransport.detectImage(image);

@@ -1,17 +1,17 @@
 import { FastifyReply } from "fastify";
 import { z } from "zod";
 
-import { sendOk, sendOkEmpty, sendOkList } from "@/http/responses";
-import historyService from "@/services/historyService";
+import { sendOk, sendOkEmpty, sendOkList } from "@/shared/http/responses";
+import historyService from "@/modules/history/history.service";
 
 import { AuthenticatedRequest } from "@/types";
-import historyRequestSchemas from "@/schemas/historyRequestSchemas";
+import historyRequestSchemas from "@/modules/history/history.request.schemas";
 import {
   historySchema,
   toHistoryDTO,
   toHistoryDTOList,
-} from "@/schemas/historySchemas";
-import { requireAuthenticatedUser } from "@/utils/requireAuthenticatedUser";
+} from "@/modules/history/history.schemas";
+import { requireAuthenticatedUser } from "@/shared/auth/requireAuthenticatedUser";
 
 type AddMyQueryBody = z.infer<
   typeof historyRequestSchemas.addMySearchQuerySchema

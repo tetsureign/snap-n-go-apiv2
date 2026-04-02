@@ -1,5 +1,5 @@
-import { NotFoundError } from "@/errors/appError";
-import historyRepository from "@/repositories/historyRepository";
+import { NotFoundError } from "@/shared/errors/appError";
+import historyRepository from "@/modules/history/history.repository";
 
 async function addSearchQueryHistory({
   userId,

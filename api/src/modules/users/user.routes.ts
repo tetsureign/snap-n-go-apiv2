@@ -4,9 +4,9 @@ import { ZodTypeProvider } from "fastify-type-provider-zod";
 import {
   handleGetMyInfo,
   handleSoftDelUser,
-} from "@/controllers/userController";
-import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
-import { userSchema } from "@/schemas/userSchemas";
+} from "@/modules/users/user.controller";
+import zodResponseSchemas from "@/shared/http/responseSchemas";
+import { userSchema } from "@/modules/users/user.schemas";
 
 const userRouter: FastifyPluginAsync = async (fastify) => {
   const app = fastify.withTypeProvider<ZodTypeProvider>();

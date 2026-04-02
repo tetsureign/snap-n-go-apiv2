@@ -1,9 +1,14 @@
-import { BadRequestError } from "@/errors/appError";
+import { BadRequestError } from "@/shared/errors/appError";
 import { env } from "@/config/env";
 
-import { createGoogleJwtService } from "@/services/googleAuth/GoogleJwtService";
-import { createGoogleOAuthService } from "@/services/googleAuth/GoogleOAuthService";
-import { AuthConfig, JwtService, OAuthProvider, OAuthService } from "@/types/auth";
+import { createGoogleJwtService } from "@/modules/auth/googleJwtService";
+import { createGoogleOAuthService } from "@/modules/auth/googleOAuthService";
+import {
+  AuthConfig,
+  JwtService,
+  OAuthProvider,
+  OAuthService,
+} from "@/modules/auth/auth.types";
 
 const authConfig: AuthConfig = {
   jwtSecret: env.jwtSecret,

@@ -1,5 +1,5 @@
-import { NotFoundError } from "@/errors/appError";
-import userRepository from "@/repositories/userRepository";
+import { NotFoundError } from "@/shared/errors/appError";
+import userRepository from "@/modules/users/user.repository";
 
 async function getUserById(userId: string) {
   return userRepository.findById(userId);

@@ -1,12 +1,15 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 
-import { BadRequestError } from "@/errors/appError";
-import { sendOkList } from "@/http/responses";
-import detectionService from "@/services/detectionService";
+import { BadRequestError } from "@/shared/errors/appError";
+import { sendOkList } from "@/shared/http/responses";
+import detectionService from "@/modules/detection/detection.service";
 
-import detectionSchemas from "@/schemas/detectionSchemas";
+import detectionSchemas from "@/modules/detection/detection.schemas";
 
-import { assertValidImageBuffer, isImageFile } from "@/utils/fileValidation";
+import {
+  assertValidImageBuffer,
+  isImageFile,
+} from "@/modules/detection/fileValidation";
 
 export const handleDetection = async (
   req: FastifyRequest,

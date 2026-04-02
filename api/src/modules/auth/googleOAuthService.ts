@@ -1,9 +1,14 @@
 import { OAuth2Client } from "google-auth-library";
 
-import { BadRequestError, UnauthorizedError } from "@/errors/appError";
-import { AuthConfig, JwtService, OAuthProvider, OAuthService } from "@/types/auth";
+import { BadRequestError, UnauthorizedError } from "@/shared/errors/appError";
+import {
+  AuthConfig,
+  JwtService,
+  OAuthProvider,
+  OAuthService,
+} from "@/modules/auth/auth.types";
 
-import userService from "@/services/userService";
+import userService from "@/modules/users/user.service";
 
 const GOOGLE_PROVIDER: OAuthProvider = "google";
 
