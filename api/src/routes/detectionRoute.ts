@@ -14,12 +14,12 @@ const detectRouter: FastifyPluginAsync = async (fastify) => {
         tags: ["Detection"],
         consumes: ["multipart/form-data"],
         response: {
-          200: zodResponseSchemas.ok(detectionSchemas.detectionResult),
+          200: zodResponseSchemas.okList(detectionSchemas.detectionResult),
           400: zodResponseSchemas.badRequest,
         },
       },
     },
-    handleDetection
+    handleDetection,
   );
 };
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const detectionResult = z.object({
+export const detectionResultSchema = z.object({
   object: z.string(),
   score: z.number(),
   coordinate: z.object({
@@ -11,8 +11,11 @@ const detectionResult = z.object({
   }),
 });
 
+export const detectionResultListSchema = z.array(detectionResultSchema);
+
 const detectionSchemas = {
-  detectionResult,
+  detectionResult: detectionResultSchema,
+  detectionResultList: detectionResultListSchema,
 };
 
 export default detectionSchemas;

@@ -56,7 +56,7 @@ export const handleGetMyHistoryLazy = async (
   );
 
   return reply.send(
-    zodResponseSchemas.ok(historySchema).parse({ data: toHistoryDTOList(entries) }),
+    zodResponseSchemas.okList(historySchema).parse({ data: toHistoryDTOList(entries) }),
   );
 };
 

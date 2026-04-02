@@ -20,7 +20,7 @@ const authRouter: FastifyPluginAsync = async (fastify) => {
         response: {
           201: zodResponseSchemas.userCreated(userSchema),
           400: zodResponseSchemas.badRequest,
-          401: zodResponseSchemas.badRequest,
+          401: zodResponseSchemas.unauthorized,
         },
       },
     },
@@ -36,7 +36,7 @@ const authRouter: FastifyPluginAsync = async (fastify) => {
         body: authSchemas.tokenBodySchema,
         response: {
           200: zodResponseSchemas.tokenRefreshed,
-          401: zodResponseSchemas.badRequest,
+          401: zodResponseSchemas.unauthorized,
         },
       },
     },

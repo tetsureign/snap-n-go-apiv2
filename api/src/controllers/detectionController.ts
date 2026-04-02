@@ -45,7 +45,7 @@ export const handleDetection = async (
 
     reply.send(
       zodResponseSchemas
-        .ok(detectionSchemas.detectionResult)
+        .okList(detectionSchemas.detectionResult)
         .parse({ data: detectionResult })
     );
 

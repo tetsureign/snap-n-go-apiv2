@@ -1,9 +1,15 @@
 import { z } from "zod";
 
-const ok = <T>(objectSchema: T) =>
+const ok = <T extends z.ZodTypeAny>(objectSchema: T) =>
   z.object({
     success: z.literal(true).default(true),
     data: objectSchema,
+  });
+
+const okList = <T extends z.ZodTypeAny>(objectSchema: T) =>
+  z.object({
+    success: z.literal(true).default(true),
+    data: z.array(objectSchema),
   });
 
 const okEmpty = z.object({
@@ -51,6 +57,7 @@ const tokenRefreshed = z.object({
 
 const zodResponseSchemas = {
   ok,
+  okList,
   okEmpty,
   notFound,
   internalError,

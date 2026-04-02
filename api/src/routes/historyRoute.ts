@@ -34,7 +34,7 @@ const historyRouter: FastifyPluginAsync = async (fastify) => {
       schema: {
         querystring: historyRequestSchemas.getMyHistoryLazySchema,
         response: {
-          200: zodResponseSchemas.ok(historySchema),
+          200: zodResponseSchemas.okList(historySchema),
         },
         tags: ["History"],
         description: "Get user's search history (paginated)",
