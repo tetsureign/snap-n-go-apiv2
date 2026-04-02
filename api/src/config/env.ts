@@ -12,7 +12,6 @@ const envSchema = z
       .min(1, "GOOGLE_CLIENT_ID environment variable is required"),
     CORS_ORIGINS: z.string().optional(),
     CORS_ORIGIN: z.string().optional(),
-    UPLOAD_TEMP_DIR: z.string().default("/tmp"),
     YOLO_SERVICE_URL: z
       .string()
       .min(1, "YOLO_SERVICE_URL environment variable is required"),
@@ -42,7 +41,6 @@ const envSchema = z
       refreshSecret: rawEnv.REFRESH_SECRET,
       googleClientId: rawEnv.GOOGLE_CLIENT_ID,
       corsOrigins,
-      uploadTempDir: rawEnv.UPLOAD_TEMP_DIR,
       yoloServiceUrl: rawEnv.YOLO_SERVICE_URL,
       dbHost: rawEnv.DB_HOST,
       dbPort: rawEnv.DB_PORT,

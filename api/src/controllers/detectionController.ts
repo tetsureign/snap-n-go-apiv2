@@ -1,67 +1,43 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 
+import { BadRequestError } from "@/errors/appError";
 import detectionService from "@/services/detectionService";
 
 import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 import detectionSchemas from "@/schemas/detectionSchemas";
 
-import { pathChecking } from "@/utils/pathChecking";
-import { isImageFile } from "@/utils/fileValidation";
-import { generateUniqueFilename } from "@/utils/filenameGenerator";
-import { saveFileToTemp, deleteFile } from "@/utils/fileStorage";
+import { assertValidImageBuffer, isImageFile } from "@/utils/fileValidation";
 
 export const handleDetection = async (
   req: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ) => {
-  // Fastify multipart: req.file() returns a promise with the file stream
   const data = await req.file();
   if (!data) {
-    return reply
-      .status(400)
-      .send(
-        zodResponseSchemas.badRequest.parse({ message: "No file uploaded" })
-      );
+    throw new BadRequestError("No file uploaded");
   }
 
-  // Validate that the file is an image
   if (!isImageFile(data.mimetype)) {
-    return reply.status(400).send(
-      zodResponseSchemas.badRequest.parse({
-        message: "Only image files are allowed",
-      })
-    );
+    throw new BadRequestError("Only image files are allowed");
   }
 
-  // Generate unique filename and save file to disk
-  const uniqueFilename = generateUniqueFilename(data.filename);
-  const tempPath = await saveFileToTemp(data.file, uniqueFilename);
+  const imageBuffer = await data.toBuffer();
 
   try {
-    const normalizedPath = pathChecking(tempPath);
-    const detectionResult = await detectionService.sendImageToYolo(
-      normalizedPath
-    );
-
-    reply.send(
-      zodResponseSchemas
-        .okList(detectionSchemas.detectionResult)
-        .parse({ data: detectionResult })
-    );
-
-    deleteFile(normalizedPath, (err) => {
-      req.log.error(err, "Failed to delete file.");
-    });
+    await assertValidImageBuffer(imageBuffer);
   } catch (error) {
-    req.log.error(error, "Error handling detection.");
-    try {
-      const safePathToDel = pathChecking(tempPath);
-      deleteFile(safePathToDel, (err) => {
-        req.log.error(err, "Failed to delete file.");
-      });
-    } catch (deleteError) {
-      req.log.error(deleteError, "Failed to validate path for deletion.");
-    }
-    reply.status(500).send(zodResponseSchemas.internalError.parse({}));
+    throw new BadRequestError((error as Error).message);
   }
+
+  const detectionResult = await detectionService.detectImage({
+    buffer: imageBuffer,
+    filename: data.filename || "image",
+    mimeType: data.mimetype || "application/octet-stream",
+  });
+
+  return reply.send(
+    zodResponseSchemas
+      .okList(detectionSchemas.detectionResult)
+      .parse({ data: detectionResult }),
+  );
 };
