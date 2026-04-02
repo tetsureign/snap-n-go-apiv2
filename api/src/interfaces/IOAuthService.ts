@@ -1,4 +1,4 @@
-import User from "@/models/User";
+import { User } from "@/generated/prisma/client";
 
 export default interface IOAuthService {
   loginWithToken(token: string): Promise<{

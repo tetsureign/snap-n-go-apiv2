@@ -1,10 +1,10 @@
 import { FastifyReply } from "fastify";
 
-import { userSchema } from "@/models/User";
 import userService from "@/services/userService";
 
 import { AuthenticatedRequest } from "@/types";
 import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
+import { toUserDTO, userSchema } from "@/schemas/userSchemas";
 
 export const handleGetMyInfo = async (
   req: AuthenticatedRequest,
@@ -20,7 +20,7 @@ export const handleGetMyInfo = async (
     }
 
     return reply.send(
-      zodResponseSchemas.ok(userSchema).parse({ data: user.toDTO() })
+      zodResponseSchemas.ok(userSchema).parse({ data: toUserDTO(user) })
     );
   } catch (error) {
     req.log.error(error, "Error fetching user");

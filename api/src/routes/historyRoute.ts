@@ -7,8 +7,8 @@ import {
   handleGetMyHistoryLazy,
 } from "@/controllers/historyController";
 import { authenticator } from "@/middlewares/authenticator";
-import { historySchema } from "@/models/SearchHistory";
 import historyRequestSchemas from "@/schemas/historyRequestSchemas";
+import { historySchema } from "@/schemas/historySchemas";
 import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 
 const historyRouter: FastifyPluginAsync = async (fastify) => {
@@ -25,7 +25,7 @@ const historyRouter: FastifyPluginAsync = async (fastify) => {
         description: "Add a search query to history",
       },
     },
-    handleAddMyQueryHistory
+    handleAddMyQueryHistory,
   );
 
   fastify.withTypeProvider<ZodTypeProvider>().get(
@@ -41,7 +41,7 @@ const historyRouter: FastifyPluginAsync = async (fastify) => {
         description: "Get user's search history (paginated)",
       },
     },
-    handleGetMyHistoryLazy
+    handleGetMyHistoryLazy,
   );
 
   fastify.withTypeProvider<ZodTypeProvider>().delete(
@@ -58,7 +58,7 @@ const historyRouter: FastifyPluginAsync = async (fastify) => {
         description: "Soft delete search history entries",
       },
     },
-    handleDeleteMyQueryHistory
+    handleDeleteMyQueryHistory,
   );
 };
 

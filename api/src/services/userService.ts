@@ -1,11 +1,11 @@
-import User from "@/models/User";
+import userRepository from "@/repositories/userRepository";
 
 async function getUserById(userId: string) {
-  return User.getById(userId);
+  return userRepository.findById(userId);
 }
 
 async function getUserByGoogleId(googleId: string) {
-  return User.getByGoogleId(googleId);
+  return userRepository.findByGoogleId(googleId);
 }
 
 async function createOrUpdateUser({
@@ -23,7 +23,7 @@ async function createOrUpdateUser({
   email: string;
   name: string;
 }) {
-  return User.createOrUpdate({
+  return userRepository.createOrUpdate({
     googleId,
     facebookId,
     discordId,
@@ -34,9 +34,9 @@ async function createOrUpdateUser({
 }
 
 async function softDeleteUser(userId: string) {
-  const user = await User.getById(userId);
+  const user = await userRepository.findById(userId);
   if (!user) return false;
-  return user.softDelete(userId);
+  return userRepository.softDeleteById(userId);
 }
 
 const userService = {

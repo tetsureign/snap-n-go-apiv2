@@ -1,4 +1,4 @@
-import SearchHistory from "@/models/SearchHistory";
+import historyRepository from "@/repositories/historyRepository";
 
 async function addSearchQueryHistory({
   userId,
@@ -7,7 +7,7 @@ async function addSearchQueryHistory({
   userId: string;
   query: string;
 }) {
-  return SearchHistory.add({ userId, searchQuery: query });
+  return historyRepository.add({ userId, searchQuery: query });
 }
 
 async function getUserQueryHistoryLazy(
@@ -15,11 +15,11 @@ async function getUserQueryHistoryLazy(
   limit: number,
   cursor?: string
 ) {
-  return SearchHistory.getUserHistory(userId, limit, cursor);
+  return historyRepository.findUserHistory(userId, limit, cursor);
 }
 
 async function softDelQueryHistory(userId: string, ids: string[]) {
-  return SearchHistory.softDeleteUserScoped(userId, ids);
+  return historyRepository.softDeleteUserScoped(userId, ids);
 }
 
 const historyService = {

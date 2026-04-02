@@ -5,9 +5,9 @@ import {
   handleOAuthLogin,
   handleRefreshToken,
 } from "@/controllers/authController";
-import { userSchema } from "@/models/User";
 import authSchemas from "@/schemas/authSchemas";
 import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
+import { userSchema } from "@/schemas/userSchemas";
 
 const authRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().post(
@@ -24,7 +24,7 @@ const authRouter: FastifyPluginAsync = async (fastify) => {
         },
       },
     },
-    handleOAuthLogin
+    handleOAuthLogin,
   );
 
   fastify.withTypeProvider<ZodTypeProvider>().post(
@@ -40,7 +40,7 @@ const authRouter: FastifyPluginAsync = async (fastify) => {
         },
       },
     },
-    handleRefreshToken
+    handleRefreshToken,
   );
 };
 

@@ -1,11 +1,15 @@
 import { FastifyReply } from "fastify";
 import { z } from "zod";
 
-import { historySchema } from "@/models/SearchHistory";
 import historyService from "@/services/historyService";
 
 import { AuthenticatedRequest } from "@/types";
 import historyRequestSchemas from "@/schemas/historyRequestSchemas";
+import {
+  historySchema,
+  toHistoryDTO,
+  toHistoryDTOList,
+} from "@/schemas/historySchemas";
 import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
 
 type AddMyQueryBody = z.infer<
@@ -31,7 +35,9 @@ export const handleAddMyQueryHistory = async (
     return reply
       .status(201)
       .send(
-        zodResponseSchemas.ok(historySchema).parse({ data: newHistoryEntry })
+        zodResponseSchemas.ok(historySchema).parse({
+          data: toHistoryDTO(newHistoryEntry),
+        })
       );
   } catch (error) {
     req.log.error(error, "Error adding search history.");
@@ -53,7 +59,7 @@ export const handleGetMyHistoryLazy = async (
     );
 
     return reply.send(
-      zodResponseSchemas.ok(historySchema).parse({ data: entries })
+      zodResponseSchemas.ok(historySchema).parse({ data: toHistoryDTOList(entries) })
     );
   } catch (error) {
     req.log.error({ error, req }, "Error fetching user's search history.");

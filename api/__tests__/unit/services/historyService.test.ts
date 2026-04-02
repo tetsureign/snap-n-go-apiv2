@@ -6,8 +6,8 @@ import { prisma } from "$/prisma/__mocks__/client";
 
 import historyService from "@/services/historyService";
 
-// Mock the prisma/client module that the models import
-vi.mock("prisma/client", () => ({
+// Mock the Prisma client module that the repositories import
+vi.mock("$/prisma/client", () => ({
   default: prisma,
 }));
 

@@ -6,8 +6,8 @@ import {
   handleSoftDelUser,
 } from "@/controllers/userController";
 import { authenticator } from "@/middlewares/authenticator";
-import { userSchema } from "@/models/User";
 import zodResponseSchemas from "@/schemas/response/zodResponseSchemas";
+import { userSchema } from "@/schemas/userSchemas";
 
 const userRouter: FastifyPluginAsync = async (fastify) => {
   fastify.withTypeProvider<ZodTypeProvider>().get(
