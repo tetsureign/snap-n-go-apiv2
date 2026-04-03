@@ -6,7 +6,7 @@ This is the backend for the [Snap & Go mobile app](https://github.com/tetsureign
 
 ## Features
 
-- OAuth authentication with Google (multi-provider support ready with DI)
+- OAuth authentication with Google (structured so additional providers can be added explicitly)
 - Object detection API that forwards images to a YOLOv5 microservice
 - User management endpoints (get user info, soft delete)
 - Search history CRUD operations with pagination
@@ -132,6 +132,30 @@ Mobile App → Fastify Backend → YOLOv5 FastAPI Microservice
 3. **YOLOv5 Microservice**: Processes images and returns detected objects with coordinates and confidence scores
 4. **MySQL Database**: Stores user accounts and search history
 
+Within the API service, the current application flow is:
+
+```text
+route -> controller -> service -> repository -> Prisma
+```
+
+Feature code is organized by module, with shared transport/error helpers extracted separately:
+
+```text
+api/src/
+  config/
+  modules/
+    auth/
+    detection/
+    history/
+    users/
+  plugins/
+  shared/
+    auth/
+    errors/
+    http/
+  types/
+```
+
 ### API Routes
 
 - `/auth` - Authentication endpoints (OAuth login, token refresh)
@@ -158,12 +182,13 @@ All commands should be run from the `api` directory.
 
 ## Development Notes
 
-- **Architecture**: Layered structure with `routes` → `controllers` → `services` → `models`
-- **Domain Models**: Implemented as classes that expose `toDTO()` and instance methods
-- **Services and Controllers**: Primarily function-based modules for simplicity and testability
-- **Dependency Injection**: Handled by Awilix; DI container configured in `src/container/dependencyInjection.ts`
+- **Architecture**: Feature-oriented modules with explicit wiring. Internally the app follows `route -> controller -> service -> repository -> Prisma`
+- **Persistence**: Prisma access is isolated to repositories rather than model wrapper classes
+- **Auth**: Fastify JWT plugin for request auth, explicit provider registry for OAuth, no DI container
+- **Services and Controllers**: Function-based modules for simplicity and testability
 - **API Documentation**: Swagger UI available at `/docs` endpoint
 - **Response Format**: Consistent response shapes using Zod schemas
-- **File Upload**: Images sent as multipart/form-data (any field name accepted). Backend forwards to YOLOv5 microservice with key 'file'. 5MB file size limit
+- **File Upload**: Images sent as multipart/form-data (any field name accepted). Uploads are validated in-memory by MIME type plus actual image parsing before forwarding to the detection transport. 5MB file size limit
+- **Detection Boundary**: Detection uses a transport abstraction with an HTTP implementation today, leaving room for a future message-queue transport
 - **Rate Limiting**: 100 requests per 15 minutes per IP (localhost exempt)
 - **TypeScript Path Aliases**: `@/*` maps to `src/*`

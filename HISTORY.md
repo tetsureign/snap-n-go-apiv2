@@ -19,7 +19,7 @@
 
 - Security
   - Rate limit: to prevent spamming and DDoS attacks. Current config: each IP is limited to 100 requests per 15 minutes, with `localhost` exempt for development convenience
-  - File handling: for each uploaded file, generate a unique filename with the current timestamp + a random string. For detection route, check if the MIME type is `image/` as well. Save uploads to the `UPLOAD_TEMP_DIR` env or `/tmp`, limit upload file size to 5MB, and additionally check if the file that was about to be sent to the microservice has its path start with the upload path above
+  - File handling: detection uploads are now validated in-memory. The route checks an allowed image MIME type, then validates that the uploaded buffer is actually decodable as an image before forwarding it to the detection transport. Upload size is limited to 5MB
   - Helmet: provides useful response headers to stop common attack vectors
   - CORS: in production (with `NODE_ENV=production`), only allow hosts specified in `CORS_ORIGIN` or `CORS_ORIGINS` env (comma-separated). Allows `GET`, `POST`, `PUT`, `DELETE`, `PATCH`, `OPTIONS` methods, and `Content-Type`, `Authorization`, `X-Requested-With` headers. Includes `Access-Control-Allow-Credentials` header
 - As I've learned more about SQL queries and joins elsewhere, I don't need raw SQL queries inside the app anymore. A modern ORM like Prisma offers great DX that integrates well with TypeScript, is widely popular and well-supported, so it's a natural choice. The only minor hiccup was that most online guides and LLMs still reference v5 common patterns (using the generated client from `node_modules` (deprecated) instead of the custom output path that v6 wants), but once I figured that out, everything else was smooth
@@ -28,3 +28,14 @@ Below is how I brought my knowledge from ASP.NET Core over to this project
 
 - I introduced Dependency Injection with `awilix` for OAuth only. OAuth is where it makes the most sense - it allows for easily swapping OAuth providers and implementations without having to change everything that handles auth. It also allows for easier mocking of those services when testing. Introducing DI everywhere would break its lean and functional flow, which is what I want to maintain. And since other services and Prisma are easily mockable, the need for DI on those services lessens dramatically
 - For tests, I'm working on adding some unit tests to core services, and integration tests to core flows. This is mostly for studying, and I believe that writing integration tests is more valuable than writing unit tests for every single part possible. Things might work independently, but breaks when wired with other things, which, is the real-world, where the app is used. Also, I've chosen Vitest over Jest, as it is more modern, supports TypeScript out-of-the-box, and is still API-compatible with Jest so there's not a lot of learning curve
+
+## Refactor Notes (2026)
+
+- The app has since been refactored away from the earlier model-wrapper and partial-DI approach
+- Awilix was removed after the OAuth experiment. Auth now uses explicit provider wiring and Fastify JWT integration instead of a container
+- Prisma access now lives in repositories, which turned out to be a useful replacement boundary for the previous Active Record-style model layer
+- Error handling is now centralized around typed application errors and one Fastify error handler
+- Environment access is centralized through a typed config module instead of scattered `process.env` reads
+- Detection no longer writes uploads to temp files. It now validates image uploads in-memory and calls a detection transport abstraction. The current transport is HTTP, but the boundary was shaped this way to make a future message-queue transport easier to introduce
+- The codebase structure is now feature-oriented under `api/src/modules/*`, with shared HTTP/auth/error helpers under `api/src/shared/*`
+- Zod ended up becoming a major contract layer in the project, not only for request validation, but also for consistent response envelopes and DTO/runtime alignment
