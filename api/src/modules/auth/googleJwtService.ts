@@ -1,7 +1,7 @@
 import * as jwt from "jsonwebtoken";
+import { AuthToken } from "@/modules/auth/auth.types";
 import { BadRequestError, UnauthorizedError } from "@/shared/errors/appError";
 import userService from "@/modules/users/user.service";
-import { AuthToken } from "@/types";
 import {
   AuthConfig,
   JwtService,

@@ -2,11 +2,17 @@ import { z } from "zod";
 
 const envSchema = z
   .object({
-    NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+    NODE_ENV: z
+      .enum(["development", "production", "test"])
+      .default("development"),
     PORT: z.coerce.number().int().positive().default(3000),
     ROUTE_PREFIX: z.string().default(""),
-    JWT_SECRET: z.string().min(1, "JWT_SECRET environment variable is required"),
-    REFRESH_SECRET: z.string().min(1, "REFRESH_SECRET environment variable is required"),
+    JWT_SECRET: z
+      .string()
+      .min(1, "JWT_SECRET environment variable is required"),
+    REFRESH_SECRET: z
+      .string()
+      .min(1, "REFRESH_SECRET environment variable is required"),
     GOOGLE_CLIENT_ID: z
       .string()
       .min(1, "GOOGLE_CLIENT_ID environment variable is required"),
@@ -19,6 +25,7 @@ const envSchema = z
     DB_PORT: z.coerce.number().int().positive().default(3306),
   })
   .transform((rawEnv) => {
+    // This transform step is mostly for CORS checking
     const isProduction = rawEnv.NODE_ENV === "production";
     const corsOriginsEnv = rawEnv.CORS_ORIGINS || rawEnv.CORS_ORIGIN;
 
@@ -28,6 +35,7 @@ const envSchema = z
       );
     }
 
+    // Allows localhost by default
     const corsOrigins = corsOriginsEnv
       ? corsOriginsEnv.split(",").map((origin) => origin.trim())
       : [/^http:\/\/localhost:\d+$/, /^http:\/\/127\.0\.0\.1:\d+$/];

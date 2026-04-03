@@ -2,15 +2,15 @@ import fastifyJwt from "@fastify/jwt";
 import { FastifyPluginAsync } from "fastify";
 
 import { env } from "@/config/env";
+import { AuthToken } from "@/modules/auth/auth.types";
 import { ForbiddenError, UnauthorizedError } from "@/shared/errors/appError";
-import { AuthToken } from "@/types";
 
 const authPlugin: FastifyPluginAsync = async (fastify) => {
   await fastify.register(fastifyJwt, {
     secret: env.jwtSecret,
   });
 
-  fastify.decorate("authenticate", async function authenticate(request, reply) {
+  fastify.decorate("authenticate", async function authenticate(request) {
     try {
       await request.jwtVerify<AuthToken>();
     } catch {

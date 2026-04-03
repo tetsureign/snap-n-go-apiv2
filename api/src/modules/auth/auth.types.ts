@@ -1,8 +1,15 @@
-import { User } from "@/generated/prisma/client";
+import "fastify";
 
-import { AuthToken } from "@/types";
+import { User } from "@/generated/prisma/client";
+import { FastifyRequest } from "fastify";
 
 export type OAuthProvider = "google";
+
+export type AuthToken = {
+  userId: string;
+  provider: OAuthProvider;
+  providerUserId: string;
+};
 
 export type AuthConfig = {
   jwtSecret: string;
@@ -31,3 +38,19 @@ export type OAuthService = {
   }>;
   verifyToken(idToken: string): Promise<unknown>;
 };
+
+declare module "@fastify/jwt" {
+  interface FastifyJWT {
+    payload: AuthToken;
+    user: AuthToken;
+  }
+}
+
+declare module "fastify" {
+  interface FastifyInstance {
+    authenticate: (
+      request: FastifyRequest,
+      reply: import("fastify").FastifyReply,
+    ) => Promise<unknown>;
+  }
+}
