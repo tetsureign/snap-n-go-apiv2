@@ -29,11 +29,7 @@ export function buildApp(): FastifyInstance {
     trustProxy: true,
     logger: {
       transport: {
-        target: "pino-pretty",
-        options: {
-          colorize: true,
-          ignore: "pid,hostname",
-        },
+        target: "@fastify/one-line-logger",
       },
       level: env.isProduction ? "info" : "debug",
     },
