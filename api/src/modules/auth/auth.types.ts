@@ -1,7 +1,6 @@
 import "fastify";
 
 import { User } from "@/generated/prisma/client";
-import { FastifyRequest } from "fastify";
 
 export type OAuthProvider = "google";
 
