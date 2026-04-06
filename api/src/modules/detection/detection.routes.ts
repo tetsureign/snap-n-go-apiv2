@@ -15,6 +15,17 @@ const detectRouter: FastifyPluginAsync = async (fastify) => {
         description: "Detect objects in an uploaded image",
         tags: ["Detection"],
         consumes: ["multipart/form-data"],
+        swaggerBody: {
+          type: "object",
+          required: ["file"],
+          properties: {
+            file: {
+              type: "string",
+              format: "binary",
+              description: "Image file to analyze",
+            },
+          },
+        },
         response: {
           200: zodResponseSchemas.okList(detectionSchemas.detectionResult),
           400: zodResponseSchemas.badRequest,

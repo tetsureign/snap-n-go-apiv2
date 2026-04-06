@@ -24,6 +24,33 @@ const RATE_LIMITER_WINDOW_MS = 15 * 60 * 1000;
 const RATE_LIMITER_MAX = 100;
 const FILE_SIZE_LIMIT = 5 * 1024 * 1024;
 
+type SwaggerSchema = {
+  body?: unknown;
+  swaggerBody?: unknown;
+};
+
+const swaggerTransform: typeof jsonSchemaTransform = (input) => {
+  const schema = input.schema as SwaggerSchema | undefined;
+
+  if (!schema?.swaggerBody) {
+    return jsonSchemaTransform(input);
+  }
+
+  const { swaggerBody, ...schemaWithoutSwaggerBody } = schema;
+  const transformed = jsonSchemaTransform({
+    ...input,
+    schema: schemaWithoutSwaggerBody,
+  });
+
+  return {
+    ...transformed,
+    schema: {
+      ...transformed.schema,
+      body: swaggerBody,
+    },
+  };
+};
+
 export function buildApp(): FastifyInstance {
   const app = fastify({
     trustProxy: true,
@@ -45,7 +72,9 @@ export function buildApp(): FastifyInstance {
   return app;
 }
 
-export async function registerApp(app: FastifyInstance): Promise<FastifyInstance> {
+export async function registerApp(
+  app: FastifyInstance,
+): Promise<FastifyInstance> {
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
 
@@ -78,7 +107,7 @@ export async function registerApp(app: FastifyInstance): Promise<FastifyInstance
       },
       servers: [],
     },
-    transform: jsonSchemaTransform,
+    transform: swaggerTransform,
   });
 
   await app.register(swaggerUI, {

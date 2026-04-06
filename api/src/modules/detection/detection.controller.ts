@@ -15,7 +15,13 @@ export const handleDetection = async (
   req: FastifyRequest,
   reply: FastifyReply,
 ) => {
-  const data = await req.file();
+  const data = await req.file({
+    limits: {
+      files: 1,
+      fields: 0,
+      parts: 1,
+    },
+  });
   if (!data) {
     throw new BadRequestError("No file uploaded");
   }
